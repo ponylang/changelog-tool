@@ -1,23 +1,5 @@
 use ".deps/sylvanc/peg"
 
-/*
-1. have a part that can validate a changelog file
-
-2. have a part that can remove entries after validating
-
-we want to use part 1 when CI runs
-
-to not allow “invalid” changelogs through
-
-because otherwise removal will go boom
-
-also
-
-look now our CHANGELOG is a langauge
-  
-lulz
-*/
-
 primitive ChangelogParser
   fun apply(): Parser val =>
     recover

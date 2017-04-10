@@ -1,4 +1,5 @@
 .DS_Store
 *.dSYM
 .deps/
+changelog-tools
 tests/tests
