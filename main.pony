@@ -39,9 +39,7 @@ actor Main
     for option in options do
       match option
       | ("verify", None) => _verify = true
-      | let err: ParseError =>
-        err.report(_env.err)
-        usage()
+      | let e: ParseError => e.report(_env.out); usage()
       end
     end
 
@@ -50,7 +48,7 @@ actor Main
     end
 
   fun usage() =>
-    _env.out.print(
+    print(
       """
       changelog-tools <changelog file> [OPTIONS]
 
@@ -59,31 +57,48 @@ actor Main
       """)
 
   fun verify() =>
-    _env.out.print("verifying " + _filename + "...")
+    print("verifying " + _filename + "...")
 
-    let p = ChangelogParser().eof() 
+    try
+      let ast = parse()
+      check_unreleased(ast)
+      print(_filename + " is a valid changelog")
+    end
 
-    let ast =
-      with
-        file =
-          try OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
-          else _env.err.print("unable to open: " + _filename); return
-          end
-      do
-        let source: String = file.read_string(file.size())
-        match p.parse(source)
-        | (let n: USize, let ast': AST) =>
-          //_env.out.print(recover val Printer(r) end)
-          ast'
-        | (let offset: USize, let r: Parser) =>
-          _env.err.print(String.join(Error(_filename, source, offset, r)))
-          return
+  fun parse(): AST ? =>
+    with
+      file =
+        try
+          OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
         else
-          _env.err.print("unable to parse file: " + _filename)
-          return
+          print("unable to open: " + _filename)
+          error
         end
+    do
+      let source: String = file.read_string(file.size())
+      match ChangelogParser().eof().parse(source)
+      | (let n: USize, let ast': AST) =>
+        //_env.out.print(recover val Printer(ast') end)
+        ast'
+      | (let offset: USize, let r: Parser) =>
+        print(String.join(Error(_filename, source, offset, r)))
+        error
+      else
+        print("unable to parse file: " + _filename)
+        error
       end
+    else error
+    end
 
-    // TODO verification steps on AST
+  fun check_unreleased(ast: AST) ? =>
+    // check that there is an unreleased section
+    try
+      (unreleased(ast).children(0) as Token).label as TUnreleased
+    else
+      print("no unreleased section found")
+      error
+    end
 
-    // _env.out.print(_filename + " is a valid changelog")
+  fun unreleased(ast: AST): AST ? => ast.children(1) as AST
+
+  fun print(str: String) => _env.out.print(str)

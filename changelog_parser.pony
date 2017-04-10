@@ -17,21 +17,25 @@ primitive ChangelogParser
     recover
       let heading = 
         if not released then
-          L("## [unreleased] - unreleased")
+          L("## [unreleased] - unreleased").term(TUnreleased)
         else
           (L("## [") * version() * L("] - ") * date()).term()
         end
 
       heading * -L("\n").many1()
-        * section("Fixed").opt()
-        * section("Added").opt()
-        * section("Changed").opt()
+        * section[Fixed](released).opt()
+        * section[Added](released).opt()
+        * section[Changed](released).opt()
     end
 
-  fun section(title: String): Parser val =>
+  fun section[S: Section](released: Bool): Parser val =>
     recover
-      let heading = (L("### ") * L(title)).term()
-      heading * -L("\n\n") * entry().many() * -L("\n").many1()
+      let heading = (L("### ") * L(S.text())).term(S)
+      let entries =
+        if released then entry().many1()
+        else entry().many() // allow empty sections in unreleased
+        end
+      heading * -L("\n\n") * entries * -L("\n").many1()
     end
 
   fun version(): Parser val =>
@@ -56,6 +60,13 @@ primitive ChangelogParser
   fun digits(): Parser val => recover digit().many1() end
 
   fun digit(): Parser val => recover R('0', '9') end
+
+primitive TUnreleased is Label fun text(): String => "Unreleased"
+
+trait Section is Label
+primitive Fixed is Section fun text(): String => "Fixed"
+primitive Added is Section fun text(): String => "Added"
+primitive Changed is Section fun text(): String => "Changed"
 
 primitive TVersion is Label fun text(): String => "Version"
 primitive TDate is Label fun text(): String => "Date"
