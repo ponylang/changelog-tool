@@ -64,21 +64,21 @@ class iso _TestParseEntry is UnitTest
   fun name(): String => "parse entry"
 
   fun apply(h: TestHelper) =>
-    ParseTest(h, ChangelogParser.entry()).run([
+    ParseTest(h, ChangelogParser.entries()).run([
       ("32-bit ARM port.", "")
-      ("- 32-bit ARM port.", "(Entry - 32-bit ARM port.)\n")
-      ("- abc\n  - def\n\n", "(Entry - abc\n  - def)\n")
+      ("- 32-bit ARM port.", "(Entries - 32-bit ARM port.)\n")
+      ("- abc\n  - def\n\n", "(Entries - abc\n  - def)\n")
       ( """
         - abc
           - def
             - ghi
           - jkl
         """,
-        "(Entry - abc\n  - def\n    - ghi\n  - jkl)\n")
+        "(Entries - abc\n  - def\n    - ghi\n  - jkl)\n")
       ("- @fowles: handle regex empty match.",
-        "(Entry - @fowles: handle regex empty match.)\n")
+        "(Entries - @fowles: handle regex empty match.)\n")
       ("- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))",
-        "(Entry - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498)))\n")
+        "(Entries - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498)))\n")
     ])
 
 class iso _TestParseChangelog is UnitTest
@@ -94,8 +94,14 @@ class iso _TestParseChangelog is UnitTest
       let source: String = file.read_string(file.size())
       match p.parse(source)
       | (let n: USize, let r: (AST | Token | NotPresent)) =>
-        h.assert_eq[USize](28782, n)
-        h.log(recover val Printer(r) end)
+        match r
+        | let ast: AST =>
+          let changelog = Changelog(ast)
+          h.assert_eq[String](source, changelog.string())
+        else
+          h.log(recover val Printer(r) end)
+          h.fail()
+        end
       | (let offset: USize, let r: Parser) =>
         h.log(String.join(Error(testfile, source, offset, r)))
         h.fail()

@@ -23,29 +23,37 @@ lulz
 actor Main
   let _env: Env
   var _filename: String = ""
-  var _verify: Bool = false
 
   new create(env: Env) =>
     _env = env
     let options = Options(_env.args)
       .> add("verify", "v", None, Optional)
-      // TODO remove empty sections from unreleased, create new unreleased section (release)
+      .> add("release", "r", None, Optional)
 
     _filename =
-      try _env.args(1)
-      else usage(); return
+      try
+        _env.args(1)
+      else
+        usage()
+        return
       end
+
+    (var f_verify, var f_release) = (false, false)
 
     for option in options do
       match option
-      | ("verify", None) => _verify = true
-      | let e: ParseError => e.report(_env.out); usage()
+      | ("verify", None) => f_verify = true
+      | ("release", None) => f_release = true
+      | let e: ParseError =>
+        e.report(_env.out)
+        usage()
+        return
       end
     end
 
-    if _verify then verify()
-    else usage()
-    end
+    if not (f_verify or f_release) then usage() end
+    if f_verify then verify() end
+    if f_release then release() end
 
   fun usage() =>
     print(
@@ -61,19 +69,19 @@ actor Main
 
     try
       let ast = parse()
-      check_unreleased(ast)
       print(_filename + " is a valid changelog")
+    end
+
+  fun release() =>
+    try
+      let ast = parse()
+      let changelog = Changelog(ast)
+      print(changelog.string())
     end
 
   fun parse(): AST ? =>
     with
-      file =
-        try
-          OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
-        else
-          print("unable to open: " + _filename)
-          error
-        end
+      file = OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
     do
       let source: String = file.read_string(file.size())
       match ChangelogParser().eof().parse(source)
@@ -87,18 +95,9 @@ actor Main
         print("unable to parse file: " + _filename)
         error
       end
-    else error
-    end
-
-  fun check_unreleased(ast: AST) ? =>
-    // check that there is an unreleased section
-    try
-      (unreleased(ast).children(0) as Token).label as TUnreleased
     else
-      print("no unreleased section found")
+      print("unable to open: " + _filename)
       error
     end
-
-  fun unreleased(ast: AST): AST ? => ast.children(1) as AST
 
   fun print(str: String) => _env.out.print(str)
