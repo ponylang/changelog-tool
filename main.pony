@@ -1,5 +1,4 @@
 use "files"
-use "options"
 use ".deps/sylvanc/peg"
 
 /*
@@ -26,57 +25,50 @@ actor Main
 
   new create(env: Env) =>
     _env = env
-    let options = Options(_env.args)
-      .> add("verify", "v", None, Optional)
-      .> add("release", "r", None, Optional)
-
-    _filename =
-      try
-        _env.args(1)
-      else
-        usage()
-        return
+    try
+      _filename = _env.args(2)
+      match _env.args(1)
+      | "verify" => verify()
+      | "release" => release(_env.args(3))
+      else error
       end
+    else
+      _env.out.print(
+        """
+        changelog-tool COMMAND <changelog file> [...]
 
-    (var f_verify, var f_release) = (false, false)
-
-    for option in options do
-      match option
-      | ("verify", None) => f_verify = true
-      | ("release", None) => f_release = true
-      | let e: ParseError =>
-        e.report(_env.out)
-        usage()
-        return
-      end
+        Commands:
+          verify   - Verify that the given changelog is valid.
+          release  - Print a changelog that is prepared for release.
+                     Example: `changelog-tool release CHANGELOG.md 0.13.1`
+        """)
+      return
     end
-
-    if not (f_verify or f_release) then usage() end
-    if f_verify then verify() end
-    if f_release then release() end
-
-  fun usage() =>
-    print(
-      """
-      changelog-tools <changelog file> [OPTIONS]
-
-      Options:
-        --verify, -v     Verify that the changelog is valid.
-      """)
 
   fun verify() =>
-    print("verifying " + _filename + "...")
-
+    _env.out.print("verifying " + _filename + "...")
     try
       let ast = parse()
-      print(_filename + " is a valid changelog")
+      _env.out.print(_filename + " is a valid changelog")
     end
 
-  fun release() =>
+  fun release(version: String) =>
     try
+      check_version(version)
       let ast = parse()
       let changelog = Changelog(ast)
-      print(changelog.string())
+      // TODO release unreleased section
+      // TODO create new unreleased section
+      _env.out.print(changelog.string())
+    end
+
+  fun check_version(version: String) ? =>
+    // chack if version is valid
+    match ChangelogParser.version().parse(version)
+    | (_, let t: Token) => None
+    else
+      _env.err.print("invalid version number: '" + version + "'")
+      error
     end
 
   fun parse(): AST ? =>
@@ -85,19 +77,17 @@ actor Main
     do
       let source: String = file.read_string(file.size())
       match ChangelogParser().eof().parse(source)
-      | (let n: USize, let ast': AST) =>
-        //_env.out.print(recover val Printer(ast') end)
-        ast'
+      | (_, let ast: AST) =>
+        //_env.out.print(recover val Printer(ast) end)
+        ast
       | (let offset: USize, let r: Parser) =>
-        print(String.join(Error(_filename, source, offset, r)))
+        _env.err.print(String.join(Error(_filename, source, offset, r)))
         error
       else
-        print("unable to parse file: " + _filename)
+        _env.err.print("unable to parse file: " + _filename)
         error
       end
     else
-      print("unable to open: " + _filename)
+      _env.err.print("unable to open: " + _filename)
       error
     end
-
-  fun print(str: String) => _env.out.print(str)
