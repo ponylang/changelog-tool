@@ -16,15 +16,15 @@ primitive ChangelogParser
           (L("## [") * version() * L("] - ") * date()).term()
         end
 
-      heading * -L("\n").many1()
-        * section[Fixed](released).opt()
-        * section[Added](released).opt()
-        * section[Changed](released).opt()
+      (heading * -L("\n").many1()
+        * section(Fixed, released).opt()
+        * section(Added, released).opt()
+        * section(Changed, released).opt()).node(TRelease)
     end
 
-  fun section[S: TSection](released: Bool): Parser val =>
+  fun section(s: TSection, released: Bool): Parser val =>
     recover
-      let heading = (L("### ") * L(S.text())).term(S)
+      let heading = (L("### ") * L(s.text())).term(s)
       let entries' =
         if released then entries()
         else entries().opt() // allow empty sections in unreleased
@@ -61,6 +61,7 @@ primitive Fixed is TSection fun text(): String => "Fixed"
 primitive Added is TSection fun text(): String => "Added"
 primitive Changed is TSection fun text(): String => "Changed"
 
+primitive TRelease is Label fun text(): String => "Release"
 primitive TVersion is Label fun text(): String => "Version"
 primitive TDate is Label fun text(): String => "Date"
 primitive TEntries is Label fun text(): String => "Entries"

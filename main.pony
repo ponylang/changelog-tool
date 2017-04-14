@@ -61,6 +61,8 @@ actor Main
       let changelog = Changelog(ast)
         .create_release(version, date)
       _env.out.print(changelog.string())
+    else
+      _env.err.print("unable to parse changelog")
     end
 
   fun check_version(version: String) ? =>
@@ -77,12 +79,12 @@ actor Main
       file = OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
     do
       let source: String = file.read_string(file.size())
-      match ChangelogParser().eof().parse(source)
+      match ChangelogParser().eof().parse(source, 0, true, NoParser)
       | (_, let ast: AST) =>
         //_env.out.print(recover val Printer(ast) end)
         ast
       | (let offset: USize, let r: Parser) =>
-        _env.err.print(String.join(Error(_filename, source, offset, r)))
+        _env.err.writev(Error(_filename, source, offset, r))
         error
       else
         _env.err.print("unable to parse file: " + _filename)

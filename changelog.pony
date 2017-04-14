@@ -5,9 +5,10 @@ class Changelog
   let released: Array[Release]
 
   new create(ast: AST) ? =>
-    unreleased = Release(ast.extract() as AST)
+    let children = ast.children.values()
+    unreleased = Release(children.next() as AST)
     released = Array[Release](ast.size() - 1)
-    for child in (ast.children(1) as AST).children.values() do
+    for child in children do
       released.push(Release(child as AST))
     end
 
@@ -73,7 +74,7 @@ class Section
   let entries: String
 
   new create(ast: AST) ? =>
-    label = (ast.children(0) as Token).label as TSection
+    label = (ast.children(0) as Token).label() as TSection
     entries =
       try
         let t = ast.children(1) as Token

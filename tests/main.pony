@@ -27,7 +27,7 @@ class ParseTest
         let result = recover val Printer(r) end
         _h.assert_eq[String](expected, result)
       | (let offset: USize, let r: Parser) =>
-        _h.log(String.join(Error("", source, offset, r)))
+        _Logv(_h, Error("", source, offset, r))
         _h.assert_eq[String](expected, "")
       | (_, Skipped) => _h.log("skipped")
       | (_, Lex) => _h.log("lex")
@@ -92,7 +92,7 @@ class iso _TestParseChangelog is UnitTest
       FilePath(h.env.root as AmbientAuth, testfile)) as File
     do
       let source: String = file.read_string(file.size())
-      match p.parse(source)
+      match p.parse(source, 0, true, NoParser) // TODO fix defaults
       | (let n: USize, let r: (AST | Token | NotPresent)) =>
         match r
         | let ast: AST =>
@@ -103,7 +103,20 @@ class iso _TestParseChangelog is UnitTest
           h.fail()
         end
       | (let offset: USize, let r: Parser) =>
-        h.log(String.join(Error(testfile, source, offset, r)))
+        _Logv(h, Error("", source, offset, r))
         h.fail()
       end
+    else
+      h.fail()
+    end
+
+primitive _Logv
+  fun apply(h: TestHelper, bsi: ByteSeqIter) =>
+    for bs in bsi.values() do 
+      h.log(
+        match bs
+        | let s: String => s
+        | let a: Array[U8] val => String.from_array(a)
+        else ""
+        end)
     end
