@@ -9,9 +9,9 @@ bin/changelog-tool: deps
 	mkdir -p bin
 	ponyc -o bin
 
-install: bin/changelog-tool
+install:
 	mkdir -p $(prefix)/bin
-	cp $^ $(prefix)/bin
+	cp bin/changelog-tool $(prefix)/bin
 
 test: deps
 	cd tests && ponyc -d && ./tests && rm tests
