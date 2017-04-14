@@ -9,7 +9,7 @@ actor Main is TestList
   fun tag tests(test: PonyTest) =>
     test(_TestParseVersion)
     test(_TestParseDate)
-    test(_TestParseEntry)
+    test(_TestParseEntries)
     test(_TestParseChangelog)
 
 class ParseTest
@@ -60,8 +60,8 @@ class iso _TestParseDate is UnitTest
       ("00-0000-00", "")
     ])
 
-class iso _TestParseEntry is UnitTest
-  fun name(): String => "parse entry"
+class iso _TestParseEntries is UnitTest
+  fun name(): String => "parse entries"
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.entries()).run([

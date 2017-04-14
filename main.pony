@@ -1,4 +1,5 @@
 use "files"
+use "time"
 use ".deps/sylvanc/peg"
 
 /*
@@ -56,9 +57,9 @@ actor Main
     try
       check_version(version)
       let ast = parse()
+      let date = Date(Time.seconds()).format("%Y-%m-%d")
       let changelog = Changelog(ast)
-      // TODO release unreleased section
-      // TODO create new unreleased section
+        .create_release(version, date)
       _env.out.print(changelog.string())
     end
 

@@ -2,7 +2,7 @@ use ".deps/sylvanc/peg"
 
 class Changelog
   let unreleased: Release
-  embed released: Array[Release]
+  let released: Array[Release]
 
   new create(ast: AST) ? =>
     unreleased = Release(ast.extract() as AST)
@@ -10,6 +10,24 @@ class Changelog
     for child in (ast.children(1) as AST).children.values() do
       released.push(Release(child as AST))
     end
+
+  new _create(unreleased': Release, released': Array[Release]) =>
+    (unreleased, released) = (unreleased', released')
+
+  fun ref create_release(version: String, date: String): Changelog^ ? =>
+    unreleased.heading = "## [" + version + "] - " + date
+
+    if (unreleased.fixed as Section).entries == "" then
+      unreleased.fixed = None
+    end
+    if (unreleased.added as Section).entries == "" then
+      unreleased.added = None
+    end
+    if (unreleased.changed as Section).entries == "" then
+      unreleased.changed = None
+    end
+
+    _create(Release._unreleased(), released.>unshift(unreleased))
 
   fun string(): String iso^ =>
     let str = (recover String end)
@@ -22,10 +40,10 @@ class Changelog
     str
 
 class Release
-  let heading: String
-  let fixed: (Section | None)
-  let added: (Section | None)
-  let changed: (Section | None)
+  var heading: String
+  var fixed: (Section | None)
+  var added: (Section | None)
+  var changed: (Section | None)
 
   new create(ast: AST) ? =>
     let t = ast.children(0) as Token
@@ -33,6 +51,12 @@ class Release
     fixed = try Section(ast.children(1) as AST) else None end
     added = try Section(ast.children(2) as AST) else None end
     changed = try Section(ast.children(3) as AST) else None end
+
+  new _unreleased() =>
+    heading = "## [unreleased] - unreleased"
+    fixed = Section._emtpy(Fixed)
+    added = Section._emtpy(Added)
+    changed = Section._emtpy(Changed)
 
   fun string(): String iso^ =>
     let str = recover String.>append(heading).>append("\n\n") end
@@ -57,6 +81,9 @@ class Section
       else
         ""
       end
+
+  new _emtpy(label': TSection) =>
+    (label, entries) = (label', "")
 
   fun is_empty(): Bool => entries == ""
 
