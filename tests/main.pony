@@ -27,7 +27,7 @@ class ParseTest
         let result = recover val Printer(r) end
         _h.assert_eq[String](expected, result)
       | (let offset: USize, let r: Parser) =>
-        _Logv(_h, Error("", source, offset, r))
+        _Logv(_h, Error("", source, offset, "SYNTAX", r.error_msg()))
         _h.assert_eq[String](expected, "")
       | (_, Skipped) => _h.log("skipped")
       | (_, Lex) => _h.log("lex")
@@ -103,7 +103,7 @@ class iso _TestParseChangelog is UnitTest
           h.fail()
         end
       | (let offset: USize, let r: Parser) =>
-        _Logv(h, Error("", source, offset, r))
+        _Logv(h, Error("", source, offset, "SYNTAX", r.error_msg()))
         h.fail()
       end
     else

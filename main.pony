@@ -120,7 +120,8 @@ actor Main
         //_env.out.print(recover val Printer(ast) end)
         ast
       | (let offset: USize, let r: Parser) =>
-        _env.err.writev(Error(_filename, source, offset, r))
+        _env.err.writev(
+          Error(_filename, source, offset, "SYNTAX", r.error_msg()))
         error
       else
         _env.err.print("unable to parse file: " + _filename)
