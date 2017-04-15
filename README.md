@@ -19,10 +19,6 @@ CHANGELOG.md is a valid changelog
 ```
 
 ## Prepare a Changelog for a Release
-```bash
-changelog-tool release CHANGELOG.md 0.13.1 > new_changelog.md
-# The changelog-tool release command normally prints the new changelog to standard output
-```
 CHANGELOG.md:
 ```markdown
 # Change Log
@@ -44,8 +40,14 @@ All notable changes to the Pony compiler and standard library will be documented
 
 
 ```
-new_changelog.md:
-```markdown
+
+```bash
+changelog-tool release CHANGELOG.md 0.13.1
+# The changelog-tool release command prints the new changelog to standard output
+# -e should be used to modify the file in changelog file.
+```
+
+```
 # Change Log
 
 All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).

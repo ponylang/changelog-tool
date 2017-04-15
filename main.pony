@@ -1,4 +1,5 @@
 use "files"
+use "options"
 use "time"
 use ".deps/sylvanc/peg"
 
@@ -26,11 +27,31 @@ actor Main
 
   new create(env: Env) =>
     _env = env
+    // TODO use the new cli package
+    // https://github.com/ponylang/ponyc/issues/1737
+    let options = Options(_env.args)
+      .>add("edit", "e", None)
+
     try
-      _filename = _env.args(2)
-      match _env.args(1)
+      var edit = false
+      for option in options do
+        match option
+        | ("edit", None) => edit = true
+        | let err: ParseError =>
+          err.report(_env.err)
+          error
+        end
+      end
+
+      let args = Array[String]
+      for arg in options.remaining().values() do
+        args.push(arg.clone())
+      end
+
+      _filename = args(2)
+      match args(1)
       | "verify" => verify()
-      | "release" => release(_env.args(3))
+      | "release" => release(args(3), edit)
       else error
       end
     else
@@ -39,9 +60,12 @@ actor Main
         changelog-tool COMMAND <changelog file> [...]
 
         Commands:
-          verify   - Verify that the given changelog is valid.
-          release  - Print a changelog that is prepared for release.
-                     Example: `changelog-tool release CHANGELOG.md 0.13.1`
+          verify       Verify that the given changelog is valid.
+          release      Print a changelog that is prepared for release.
+                       Example: `changelog-tool release CHANGELOG.md 0.13.1`
+
+        Options:
+          --edit, -e   Edit the changelog file (release only).
         """)
       return
     end
@@ -53,16 +77,28 @@ actor Main
       _env.out.print(_filename + " is a valid changelog")
     end
 
-  fun release(version: String) =>
+  fun release(version: String, edit: Bool) =>
     try
       check_version(version)
       let ast = parse()
       let date = Date(Time.seconds()).format("%Y-%m-%d")
       let changelog = Changelog(ast)
         .create_release(version, date)
-      _env.out.print(changelog.string())
+      let changelog_str: String = changelog.string()
+
+      if edit then
+        with
+          file = File(FilePath(_env.root as AmbientAuth, _filename))
+        do
+          file
+            .>write(changelog_str)
+            .>flush()
+        end
+      else
+        _env.out.print(changelog_str)
+      end
     else
-      _env.err.print("unable to parse changelog")
+      _env.err.print("unable to perform release prep")
     end
 
   fun check_version(version: String) ? =>
