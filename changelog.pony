@@ -1,4 +1,4 @@
-use ".deps/sylvanc/peg"
+use ".deps/theodus/peg"
 
 class Changelog
   let unreleased: Release
@@ -48,7 +48,7 @@ class Release
 
   new create(ast: AST) ? =>
     let t = ast.children(0) as Token
-    heading = t.source.trim(t.offset, t.offset + t.length)
+    heading = t.source.content.trim(t.offset, t.offset + t.length)
     fixed = try Section(ast.children(1) as AST) else None end
     added = try Section(ast.children(2) as AST) else None end
     changed = try Section(ast.children(3) as AST) else None end
@@ -78,7 +78,7 @@ class Section
     entries =
       try
         let t = ast.children(1) as Token
-        t.source.trim(t.offset, t.offset + t.length)
+        t.source.content.trim(t.offset, t.offset + t.length)
       else
         ""
       end

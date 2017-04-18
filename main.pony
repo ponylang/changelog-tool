@@ -1,7 +1,7 @@
 use "files"
 use "options"
 use "time"
-use ".deps/sylvanc/peg"
+use ".deps/theodus/peg"
 
 /*
 1. have a part that can validate a changelog file
@@ -103,7 +103,8 @@ actor Main
 
   fun check_version(version: String) ? =>
     // chack if version is valid
-    match ChangelogParser.version().parse(version)
+    let source = Source.from_string(version)
+    match recover val ChangelogParser.version().parse(source) end
     | (_, let t: Token) => None
     else
       _env.err.print("invalid version number: '" + version + "'")
@@ -111,17 +112,18 @@ actor Main
     end
 
   fun parse(): AST ? =>
-    with
-      file = OpenFile(FilePath(_env.root as AmbientAuth, _filename)) as File
-    do
-      let source: String = file.read_string(file.size())
-      match ChangelogParser().eof().parse(source, 0, true, NoParser)
+    try
+      let source = Source(FilePath(_env.root as AmbientAuth, _filename))
+      match
+        recover val
+          ChangelogParser().parse(source) 
+        end
       | (_, let ast: AST) =>
         //_env.out.print(recover val Printer(ast) end)
         ast
-      | (let offset: USize, let r: Parser) =>
-        _env.err.writev(
-          Error(_filename, source, offset, "SYNTAX", r.error_msg()))
+      | (let offset: USize, let r: Parser val) =>
+        let e = recover val SyntaxError(source, offset, r) end
+        _env.err.writev(PegFormatError.console(e))
         error
       else
         _env.err.print("unable to parse file: " + _filename)

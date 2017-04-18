@@ -1,4 +1,4 @@
-use ".deps/sylvanc/peg"
+use ".deps/theodus/peg"
 
 primitive ChangelogParser
   fun apply(): Parser val =>
