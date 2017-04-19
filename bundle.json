@@ -1,8 +1,9 @@
 {
   "deps": [
     {
+      "tag": "48f019a",
       "type": "github",
-      "repo": "theodus/peg"
+      "repo": "sylvanc/peg"
     }
   ]
 }

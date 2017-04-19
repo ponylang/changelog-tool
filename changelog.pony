@@ -1,4 +1,4 @@
-use ".deps/theodus/peg"
+use ".deps/sylvanc/peg"
 
 class Changelog
   let unreleased: Release

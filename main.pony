@@ -1,7 +1,7 @@
 use "files"
 use "options"
 use "time"
-use ".deps/theodus/peg"
+use ".deps/sylvanc/peg"
 
 /*
 1. have a part that can validate a changelog file
