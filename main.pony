@@ -1,35 +1,11 @@
 use "files"
 use "options"
-use "time"
-use ".deps/sylvanc/peg"
-
-/*
-1. have a part that can validate a changelog file
-
-2. have a part that can remove entries after validating
-
-we want to use part 1 when CI runs
-
-to not allow “invalid” changelogs through
-
-because otherwise removal will go boom
-
-also
-
-look now our CHANGELOG is a langauge
-  
-lulz
-*/
 
 actor Main
-  let _env: Env
-  var _filename: String = ""
-
   new create(env: Env) =>
-    _env = env
     // TODO use the new cli package
     // https://github.com/ponylang/ponyc/issues/1737
-    let options = Options(_env.args)
+    let options = Options(env.args)
       .>add("edit", "e", None)
 
     try
@@ -38,7 +14,7 @@ actor Main
         match option
         | ("edit", None) => edit = true
         | let err: ParseError =>
-          err.report(_env.err)
+          err.report(env.err)
           error
         end
       end
@@ -48,14 +24,24 @@ actor Main
         args.push(arg.clone())
       end
 
-      _filename = args(2)
+      let filename = args(2)
+      let filepath =
+        try
+          FilePath(env.root as AmbientAuth, filename)
+        else
+          env.err.print("unable to open: " + filename)
+          return
+        end
+      let tool = ChangelogTool(env, filename, filepath)
+
       match args(1)
-      | "verify" => verify()
-      | "release" => release(args(3), edit)
+      | "verify" => tool.verify()
+      | "release" => tool.release(args(3), edit)
+      | "unreleased" => tool.unreleased(edit)
       else error
       end
     else
-      _env.out.print(
+      env.out.print(
         """
         changelog-tool COMMAND <changelog file> [...]
 
@@ -63,73 +49,9 @@ actor Main
           verify       Verify that the given changelog is valid.
           release      Print a changelog that is prepared for release.
                        Example: `changelog-tool release CHANGELOG.md 0.13.1`
+          unreleased   Add unreleased section to changelog if none exists.
 
         Options:
-          --edit, -e   Edit the changelog file (release only).
+          --edit, -e   Edit the changelog file (release and unreleased only).
         """)
-      return
-    end
-
-  fun verify() =>
-    _env.out.print("verifying " + _filename + "...")
-    try
-      let ast = parse()
-      _env.out.print(_filename + " is a valid changelog")
-    end
-
-  fun release(version: String, edit: Bool) =>
-    try
-      check_version(version)
-      let ast = parse()
-      let date = Date(Time.seconds()).format("%Y-%m-%d")
-      let changelog = Changelog(ast)
-        .create_release(version, date)
-      let changelog_str: String = changelog.string()
-
-      if edit then
-        with
-          file = File(FilePath(_env.root as AmbientAuth, _filename))
-        do
-          file
-            .>write(changelog_str)
-            .>flush()
-        end
-      else
-        _env.out.print(changelog_str)
-      end
-    else
-      _env.err.print("unable to perform release prep")
-    end
-
-  fun check_version(version: String) ? =>
-    // chack if version is valid
-    let source = Source.from_string(version)
-    match recover val ChangelogParser.version().parse(source) end
-    | (_, let t: Token) => None
-    else
-      _env.err.print("invalid version number: '" + version + "'")
-      error
-    end
-
-  fun parse(): AST ? =>
-    try
-      let source = Source(FilePath(_env.root as AmbientAuth, _filename))
-      match
-        recover val
-          ChangelogParser().parse(source) 
-        end
-      | (_, let ast: AST) =>
-        //_env.out.print(recover val Printer(ast) end)
-        ast
-      | (let offset: USize, let r: Parser val) =>
-        let e = recover val SyntaxError(source, offset, r) end
-        _env.err.writev(PegFormatError.console(e))
-        error
-      else
-        _env.err.print("unable to parse file: " + _filename)
-        error
-      end
-    else
-      _env.err.print("unable to open: " + _filename)
-      error
     end

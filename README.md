@@ -54,20 +54,6 @@ changelog-tool release CHANGELOG.md 0.13.1
 
 All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [unreleased] - unreleased
-
-### Fixed
-
-
-
-### Added
-
-
-
-### Changed
-
-
-
 ## [0.13.1] - 2017-04-14
 
 ### Added
@@ -77,3 +63,8 @@ All notable changes to the Pony compiler and standard library will be documented
 ```
 
 Note that a new unreleased area has been added to the top of the changelog and only the `Added` section of the previous unreleased area has been included in the 0.13.1 release since the other two sections had no entries.
+
+An empty unreleased section may then be added with the command
+```bash
+changelog-tool unreleased CHANGELOG.md -e
+```

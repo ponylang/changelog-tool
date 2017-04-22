@@ -4,7 +4,7 @@ primitive ChangelogParser
   fun apply(): Parser val =>
     recover
       let heading = L(_Util.changelog_heading())
-      -heading * -L("\n").many1() * release(false) * release().many()
+      -heading * -L("\n").many1() * release(false).opt() * release().many()
     end
 
   fun release(released: Bool = true): Parser val =>
