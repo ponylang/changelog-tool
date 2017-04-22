@@ -2,6 +2,8 @@
 Tool for modifying the ponyc changelog
 
 ## Installation
+The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
+
 ```bash
 git clone https://github.com/ponylang/changelog-tool
 cd changelog-tool
