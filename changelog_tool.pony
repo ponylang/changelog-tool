@@ -30,7 +30,6 @@ class ChangelogTool
     end
 
   fun _check_version(version: String) ? =>
-    // chack if version is valid
     let source = Source.from_string(version)
     match recover val ChangelogParser.version().parse(source) end
     | (_, let t: Token) => None
