@@ -1,4 +1,4 @@
-use ".deps/sylvanc/peg"
+use "peg"
 
 class Changelog
   let unreleased: (Release | None)

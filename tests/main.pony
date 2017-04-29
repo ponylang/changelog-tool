@@ -1,7 +1,6 @@
 use "files"
 use "ponytest"
-use ".."
-use "../.deps/sylvanc/peg"
+use "peg"
 
 actor Main is TestList
   new create(env: Env) => PonyTest(env, this)

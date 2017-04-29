@@ -1,7 +1,7 @@
 {
   "deps": [
     {
-      "tag": "48f019a",
+      "tag": "0fbabce",
       "type": "github",
       "repo": "sylvanc/peg"
     }

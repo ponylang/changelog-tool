@@ -1,4 +1,4 @@
-use ".deps/sylvanc/peg"
+use "peg"
 
 primitive ChangelogParser
   fun apply(): Parser val =>
@@ -9,7 +9,7 @@ primitive ChangelogParser
 
   fun release(released: Bool = true): Parser val =>
     recover
-      let heading = 
+      let heading =
         if not released then
           L("## [unreleased] - unreleased").term()
         else

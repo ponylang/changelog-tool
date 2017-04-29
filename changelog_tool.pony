@@ -1,6 +1,6 @@
 use "files"
 use "time"
-use ".deps/sylvanc/peg"
+use "peg"
 
 class ChangelogTool
   let _env: Env
