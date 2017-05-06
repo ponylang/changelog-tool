@@ -7,7 +7,7 @@ deps:
 
 bin/changelog-tool: deps
 	mkdir -p bin
-	ponyc -o bin
+	stable env ponyc -o bin
 
 install:
 	mkdir -p $(prefix)/bin
