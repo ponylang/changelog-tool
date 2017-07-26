@@ -24,19 +24,19 @@ actor Main
         args.push(arg.clone())
       end
 
-      let filename = args(2)
+      let filename = args(2)?
       let filepath =
         try
-          FilePath(env.root as AmbientAuth, filename)
+          FilePath(env.root as AmbientAuth, filename)?
         else
           env.err.print("unable to open: " + filename)
           return
         end
       let tool = ChangelogTool(env, filename, filepath)
 
-      match args(1)
+      match args(1)?
       | "verify" => tool.verify()
-      | "release" => tool.release(args(3), edit)
+      | "release" => tool.release(args(3)?, edit)
       | "unreleased" => tool.unreleased(edit)
       else error
       end
