@@ -8,9 +8,9 @@ class Changelog
     let children = ast.children.values()
     released = Array[Release](ast.size())
     if ast.size() > 0 then
-      unreleased = try Release(children.next() as AST) end
+      unreleased = try Release(children.next()? as AST)? end
       for child in children do
-        released.push(Release(child as AST))
+        released.push(Release(child as AST)?)
       end
     else
       unreleased = None
@@ -60,11 +60,11 @@ class Release
   var changed: (Section | None)
 
   new create(ast: AST) ? =>
-    let t = ast.children(0) as Token
+    let t = ast.children(0)? as Token
     heading = t.source.content.trim(t.offset, t.offset + t.length)
-    fixed = try Section(ast.children(1) as AST) else None end
-    added = try Section(ast.children(2) as AST) else None end
-    changed = try Section(ast.children(3) as AST) else None end
+    fixed = try Section(ast.children(1)? as AST)? else None end
+    added = try Section(ast.children(2)? as AST)? else None end
+    changed = try Section(ast.children(3)? as AST)? else None end
 
   new _unreleased() =>
     heading = "## [unreleased] - unreleased"
@@ -87,10 +87,10 @@ class Section
   let entries: String
 
   new create(ast: AST) ? =>
-    label = (ast.children(0) as Token).label() as TSection
+    label = (ast.children(0)? as Token).label() as TSection
     entries =
       try
-        let t = ast.children(1) as Token
+        let t = ast.children(1)? as Token
         t.source.content.trim(t.offset, t.offset + t.length)
       else
         ""

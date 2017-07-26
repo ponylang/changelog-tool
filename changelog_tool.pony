@@ -13,16 +13,16 @@ class ChangelogTool
   fun verify() =>
     _env.out.print("verifying " + _filename + "...")
     try
-      let ast = _parse()
+      let ast = _parse()?
       _env.out.print(_filename + " is a valid changelog")
     end
 
   fun release(version: String, edit: Bool) =>
     try
-      _check_version(version)
+      _check_version(version)?
       let date = Date(Time.seconds()).format("%Y-%m-%d")
-      let changelog: String = Changelog(_parse())
-        .create_release(version, date)
+      let changelog: String = Changelog(_parse()?)?
+        .create_release(version, date)?
         .string()
       _edit_or_print(edit, changelog)
     else
@@ -40,7 +40,7 @@ class ChangelogTool
 
   fun unreleased(edit: Bool) =>
     try
-      let changelog: String = Changelog(_parse())
+      let changelog: String = Changelog(_parse()?)?
         .create_unreleased()
         .string()
       _edit_or_print(edit, changelog)
@@ -60,7 +60,7 @@ class ChangelogTool
     end
 
   fun _parse(): AST ? =>
-    let source = Source(FilePath(_env.root as AmbientAuth, _filename))
+    let source = Source(FilePath(_env.root as AmbientAuth, _filename)?)?
     match recover val ChangelogParser().parse(source) end
     | (_, let ast: AST) =>
       //_env.out.print(recover val Printer(ast) end)
