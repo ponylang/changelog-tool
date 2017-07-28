@@ -1,6 +1,6 @@
 use "files"
-use "time"
 use "peg"
+use "time"
 
 class ChangelogTool
   let _env: Env
@@ -13,7 +13,7 @@ class ChangelogTool
   fun verify() =>
     _env.out.print("verifying " + _filename + "...")
     try
-      let ast = _parse()?
+      _parse()?
       _env.out.print(_filename + " is a valid changelog")
     end
 
@@ -21,9 +21,10 @@ class ChangelogTool
     try
       _check_version(version)?
       let date = Date(Time.seconds()).format("%Y-%m-%d")
-      let changelog: String = Changelog(_parse()?)?
-        .create_release(version, date)?
-        .string()
+      let changelog: String =
+        Changelog(_parse()?)?
+          .create_release(version, date)?
+          .string()
       _edit_or_print(edit, changelog)
     else
       _env.err.print("unable to perform release prep")
@@ -40,9 +41,10 @@ class ChangelogTool
 
   fun unreleased(edit: Bool) =>
     try
-      let changelog: String = Changelog(_parse()?)?
-        .create_unreleased()
-        .string()
+      let changelog: String =
+        Changelog(_parse()?)?
+          .create_unreleased()
+          .string()
       _edit_or_print(edit, changelog)
     else
       _env.out.print("error")
@@ -52,8 +54,8 @@ class ChangelogTool
     if edit then
       with file = File(_filepath) do
         file
-          .>write(s)
-          .>flush()
+          .> write(s)
+          .> flush()
       end
     else
       _env.out.print(s)

@@ -40,48 +40,48 @@ class iso _TestParseVersion is UnitTest
   fun name(): String => "parse version"
 
   fun apply(h: TestHelper) =>
-    ParseTest(h, ChangelogParser.version()).run([
-      ("0.0.0", "(Version 0.0.0)\n")
-      ("1.23.9", "(Version 1.23.9)\n")
-      ("0..0", "")
-      (".0.0", "")
-      ("0..", "")
-      ("0", "")
-    ])
+    ParseTest(h, ChangelogParser.version()).run(
+      [ ("0.0.0", "(Version 0.0.0)\n")
+        ("1.23.9", "(Version 1.23.9)\n")
+        ("0..0", "")
+        (".0.0", "")
+        ("0..", "")
+        ("0", "")
+      ])
 
 class iso _TestParseDate is UnitTest
   fun name(): String => "parse date"
 
   fun apply(h: TestHelper) =>
-    ParseTest(h, ChangelogParser.date()).run([
-      ("2017-04-07", "(Date 2017-04-07)\n")
-      ("0000-00-00", "(Date 0000-00-00)\n")
-      ("0000-00-0", "")
-      ("0000-0-00", "")
-      ("000-00-00", "")
-      ("00-0000-00", "")
-    ])
+    ParseTest(h, ChangelogParser.date()).run(
+      [ ("2017-04-07", "(Date 2017-04-07)\n")
+        ("0000-00-00", "(Date 0000-00-00)\n")
+        ("0000-00-0", "")
+        ("0000-0-00", "")
+        ("000-00-00", "")
+        ("00-0000-00", "")
+      ])
 
 class iso _TestParseEntries is UnitTest
   fun name(): String => "parse entries"
 
   fun apply(h: TestHelper) =>
-    ParseTest(h, ChangelogParser.entries()).run([
-      ("32-bit ARM port.", "")
-      ("- 32-bit ARM port.", "(Entries - 32-bit ARM port.)\n")
-      ("- abc\n  - def\n\n", "(Entries - abc\n  - def)\n")
-      ( """
-        - abc
-          - def
-            - ghi
-          - jkl
-        """,
-        "(Entries - abc\n  - def\n    - ghi\n  - jkl)\n")
-      ("- @fowles: handle regex empty match.",
-        "(Entries - @fowles: handle regex empty match.)\n")
-      ("- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))",
-        "(Entries - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498)))\n")
-    ])
+    ParseTest(h, ChangelogParser.entries()).run(
+      [ ("32-bit ARM port.", "")
+        ("- 32-bit ARM port.", "(Entries - 32-bit ARM port.)\n")
+        ("- abc\n  - def\n\n", "(Entries - abc\n  - def)\n")
+        ( """
+          - abc
+            - def
+              - ghi
+            - jkl
+          """,
+          "(Entries - abc\n  - def\n    - ghi\n  - jkl)\n" )
+        ( "- @fowles: handle regex empty match.",
+          "(Entries - @fowles: handle regex empty match.)\n" )
+        ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))",
+          "(Entries - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498)))\n" )
+      ])
 
 class iso _TestParseChangelog is UnitTest
   fun name(): String => "parse CHANGELOG"
@@ -122,7 +122,6 @@ primitive _Logv
         match bs
         | let s: String => s
         | let a: Array[U8] val => String.from_array(a)
-        else ""
         end)
     end
     h.log(consume str)

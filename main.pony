@@ -3,10 +3,10 @@ use "options"
 
 actor Main
   new create(env: Env) =>
-    // TODO use the new cli package
-    // https://github.com/ponylang/ponyc/issues/1737
-    let options = Options(env.args)
-      .>add("edit", "e", None)
+    // TODO use the cli package instead of options
+    let options =
+      Options(env.args)
+        .> add("edit", "e", None)
 
     try
       var edit = false

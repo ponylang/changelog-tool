@@ -45,8 +45,8 @@ class Changelog
 
   fun string(): String iso^ =>
     let str = (recover String end)
-      .>append(_Util.changelog_heading())
-      .>append("\n")
+      .> append(_Util.changelog_heading())
+      .> append("\n")
     if unreleased isnt None then str.append(unreleased.string()) end
     for release in released.values() do
       str.append(release.string())
@@ -73,7 +73,7 @@ class Release
     changed = Section._emtpy(Changed)
 
   fun string(): String iso^ =>
-    let str = recover String.>append(heading).>append("\n\n") end
+    let str = recover String .> append(heading) .> append("\n\n") end
     for section in [fixed; added; changed].values() do
       match section
       | let s: this->Section =>
@@ -104,8 +104,8 @@ class Section
   fun string(): String =>
     recover
       String
-        .>append("### ")
-        .>append(label.text())
-        .>append("\n\n")
-        .>append(entries)
+        .> append("### ")
+        .> append(label.text())
+        .> append("\n\n")
+        .> append(entries)
     end
