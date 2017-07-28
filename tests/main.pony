@@ -91,7 +91,7 @@ class iso _TestParseChangelog is UnitTest
     let testfile = "CHANGELOG.md"
 
     with file = OpenFile(
-      FilePath(h.env.root as AmbientAuth, testfile)) as File
+      FilePath(h.env.root as AmbientAuth, testfile)?) as File
     do
       let source: String = file.read_string(file.size())
       let source' = Source.from_string(source)
@@ -99,7 +99,7 @@ class iso _TestParseChangelog is UnitTest
       | (let n: USize, let r: (AST | Token | NotPresent)) =>
         match r
         | let ast: AST =>
-          let changelog = Changelog(ast)
+          let changelog = Changelog(ast)?
           h.assert_eq[String](source, changelog.string())
         else
           h.log(recover val Printer(r) end)

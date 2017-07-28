@@ -14,7 +14,9 @@ install:
 	cp bin/changelog-tool $(prefix)/bin
 
 test: deps
-	stable env ponyc -d tests && ./tests && rm tests
+	cd tests && \
+		stable env ponyc -d && ./tests && \
+		rm tests && cd ..
 
 clean:
 	rm -rf bin
