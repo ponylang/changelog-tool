@@ -20,19 +20,7 @@ matrix:
         - STABLE_VERSION="0.0.1"
 
 install:
-  - export INSTALL_STARTED_AT=`pwd`
-  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys "8756 C4F7 65C9 AC3C B6B8  5D62 379C E192 D401 AB61"
-  - echo "deb https://dl.bintray.com/pony-language/ponyc-debian pony-language main" | sudo tee -a /etc/apt/sources.list
-  - sudo apt-get update
-  - sudo apt-get -V install ponyc
-  - sudo apt-get install git
-  - cd /tmp
-  - git clone https://github.com/ponylang/pony-stable.git
-  - cd pony-stable
-  - git checkout $STABLE_VERSION
-  - make
-  - sudo make install
-  - cd $INSTALL_STARTED_AT
+  - bash .travis_install.bash
 
 script:
   - make test
