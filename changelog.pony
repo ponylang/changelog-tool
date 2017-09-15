@@ -5,15 +5,21 @@ class Changelog
   let released: Array[Release]
 
   new create(ast: AST) ? =>
-    let children = ast.children.values()
-    released = Array[Release](ast.size())
-    if ast.size() > 0 then
-      unreleased = try Release(children.next()? as AST)? end
-      for child in children do
-        released.push(Release(child as AST)?)
-      end
+    match ast.label()
+    | let _: TRelease =>
+      unreleased = Release(ast)?
+      released = Array[Release]
     else
-      unreleased = None
+      let children = ast.children.values()
+      released = Array[Release](ast.size())
+      if ast.size() > 0 then
+        unreleased = try Release(children.next()? as AST)? end
+        for child in children do
+          released.push(Release(child as AST)?)
+        end
+      else
+        unreleased = None
+      end
     end
 
   new _create(unreleased': (Release | None), released': Array[Release]) =>
