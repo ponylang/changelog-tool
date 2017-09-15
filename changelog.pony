@@ -67,9 +67,9 @@ class Release
 
   new _unreleased() =>
     heading = "## [unreleased] - unreleased"
-    fixed = Section._emtpy(Fixed)
-    added = Section._emtpy(Added)
-    changed = Section._emtpy(Changed)
+    fixed = Section._empty(Fixed)
+    added = Section._empty(Added)
+    changed = Section._empty(Changed)
 
   fun string(): String iso^ =>
     let str = recover String .> append(heading) .> append("\n\n") end
@@ -95,7 +95,7 @@ class Section
         ""
       end
 
-  new _emtpy(label': TSection) =>
+  new _empty(label': TSection) =>
     (label, entries) = (label', "")
 
   fun is_empty(): Bool => entries == ""
