@@ -23,7 +23,7 @@ class ChangelogTool
       let date = Date(Time.seconds()).format("%Y-%m-%d")
       let changelog: String =
         Changelog(_parse()?)?
-          .create_release(version, date)?
+          .> create_release(version, date)?
           .string()
       _edit_or_print(edit, changelog)
     else
@@ -43,7 +43,7 @@ class ChangelogTool
     try
       let changelog: String =
         Changelog(_parse()?)?
-          .create_unreleased()
+          .> create_unreleased()
           .string()
       _edit_or_print(edit, changelog)
     else
@@ -66,7 +66,7 @@ class ChangelogTool
     let source = Source(FilePath(_env.root as AmbientAuth, _filename)?)?
     match recover val ChangelogParser().parse(source) end
     | (_, let ast: AST) =>
-      //_env.out.print(recover val Printer(ast) end)
+      // _env.out.print(recover val Printer(ast) end)
       ast
     | (let offset: USize, let r: Parser val) =>
       let e = recover val SyntaxError(source, offset, r) end

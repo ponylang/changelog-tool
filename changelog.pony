@@ -1,13 +1,16 @@
 use "peg"
 
 class Changelog
-  let unreleased: (Release | None)
-  let released: Array[Release]
+  let heading: String
+  var unreleased: (Release | None)
+  embed released: Array[Release]
 
   new create(ast: AST) ? =>
     let children = ast.children.values()
-    released = Array[Release](ast.size())
-    if ast.size() > 0 then
+    released = Array[Release]
+
+    heading = (children.next()? as Token).string()
+    if ast.size() > 1 then
       unreleased = try Release(children.next()? as AST)? end
       for child in children do
         released.push(Release(child as AST)?)
@@ -16,10 +19,7 @@ class Changelog
       unreleased = None
     end
 
-  new _create(unreleased': (Release | None), released': Array[Release]) =>
-    (unreleased, released) = (unreleased', released')
-
-  fun ref create_release(version: String, date: String): Changelog^ ? =>
+  fun ref create_release(version: String, date: String) ? =>
     match unreleased
     | let r: Release =>
       r.heading = "## [" + version + "] - " + date
@@ -33,19 +33,18 @@ class Changelog
       if (r.changed as Section).entries == "" then
         r.changed = None
       end
-
-      _create(None, released.>unshift(r))
-    else this
+    else
+      this
     end
 
-  fun ref create_unreleased(): Changelog^ =>
-    if unreleased is None then _create(Release._unreleased(), released)
-    else this
+  fun ref create_unreleased() =>
+    if unreleased is None then
+      unreleased = Release._unreleased()
     end
 
   fun string(): String iso^ =>
     let str = (recover String end)
-      .> append(_Util.changelog_heading())
+      .> append(heading)
       .> append("\n")
     if unreleased isnt None then str.append(unreleased.string()) end
     for release in released.values() do
@@ -77,7 +76,7 @@ class Release
     for section in [fixed; added; changed].values() do
       match section
       | let s: this->Section =>
-        str.>append(s.string()).>append("\n\n")
+        str .> append(s.string()) .> append("\n\n")
       end
     end
     str
