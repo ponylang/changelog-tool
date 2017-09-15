@@ -11,6 +11,7 @@ actor Main is TestList
     test(_TestParseDate)
     test(_TestParseEntries)
     test(_TestParseChangelog)
+    test(_TestSingleRelease)
 
 class ParseTest
   let _h: TestHelper
@@ -111,6 +112,72 @@ class iso _TestParseChangelog is UnitTest
         h.fail()
       end
     else
+      h.fail()
+    end
+
+class iso _TestSingleRelease is UnitTest
+  fun name(): String => "single release"
+
+  fun apply(h: TestHelper) ? =>
+    let input =
+      """
+      # Change Log
+
+      All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
+
+      ## [unreleased] - unreleased
+
+      ### Fixed
+
+      - Fix invalid separator in PONYPATH for Windows. ([PR #32](https://github.com/ponylang/pony-stable/pull/32))
+
+      ### Added
+
+
+
+      ### Changed
+
+
+      """
+
+    let expected =
+      """
+      # Change Log
+
+      All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
+
+      ## [unreleased] - unreleased
+
+      ### Fixed
+
+      - Fix invalid separator in PONYPATH for Windows. ([PR #32](https://github.com/ponylang/pony-stable/pull/32))
+
+      ### Added
+
+
+
+      ### Changed
+
+
+
+      """
+
+    let source = Source.from_string(input)
+    let p = recover val ChangelogParser() end
+    match recover val p.parse(source) end
+    | (let n: USize, let r: (AST | Token | NotPresent)) =>
+      match r
+      | let ast: AST =>
+        let changelog = Changelog(ast)?
+        h.log(changelog.string())
+        h.assert_eq[String](expected, changelog.string())
+      else
+        h.log(recover val Printer(r) end)
+        h.fail()
+      end
+    | (let offset: USize, let r: Parser val) =>
+      let e = recover val SyntaxError(source, offset, r) end
+      _Logv(h, PegFormatError.console(e))
       h.fail()
     end
 
