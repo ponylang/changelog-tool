@@ -3,8 +3,13 @@ use "peg"
 primitive ChangelogParser
   fun apply(): Parser val =>
     recover
-      let heading = L(_Util.changelog_heading())
-      -heading * -L("\n").many1() * release(false).opt() * release().many()
+      head() * release(false).opt() * release().many()
+    end
+
+  fun head(): Parser val =>
+    recover
+      (not L("\n## [") * Unicode).many().term(THeading)
+        * -L("\n").opt()
     end
 
   fun release(released: Bool = true): Parser val =>
@@ -56,6 +61,8 @@ primitive ChangelogParser
 
   fun digit(): Parser val => recover R('0', '9') end
 
+primitive THeading is Label fun text(): String => "Heading"
+
 trait val TSection is Label
 primitive Fixed is TSection fun text(): String => "Fixed"
 primitive Added is TSection fun text(): String => "Added"
@@ -65,7 +72,3 @@ primitive TRelease is Label fun text(): String => "Release"
 primitive TVersion is Label fun text(): String => "Version"
 primitive TDate is Label fun text(): String => "Date"
 primitive TEntries is Label fun text(): String => "Entries"
-
-primitive _Util
-  fun changelog_heading(): String =>
-    "# Change Log\n\nAll notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).\n"
