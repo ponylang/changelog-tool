@@ -54,6 +54,7 @@ class ChangelogTool
     if edit then
       with file = File(_filepath) do
         file
+          .> set_length(0)
           .> write(s)
           .> flush()
       end
