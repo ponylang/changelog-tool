@@ -8,7 +8,7 @@ primitive ChangelogParser
 
   fun head(): Parser val =>
     recover
-      (not L("\n## [") * Unicode).many().term(THeading)
+      (not L("\n## [") * Unicode).many().term()
         * -L("\n").opt()
     end
 
@@ -32,9 +32,10 @@ primitive ChangelogParser
       let heading = (L("### ") * L(s.text())).term(s)
       let entries' =
         if released then entries()
-        else entries().opt() // allow empty sections in unreleased
+        // allow empty sections in unreleased
+        else entries().opt()
         end
-      heading * -L("\n\n") * entries' * -L("\n").many1()
+      (heading * -L("\n").many() * entries').node(NoLabel)
     end
 
   fun version(): Parser val =>
@@ -50,18 +51,18 @@ primitive ChangelogParser
       (digits4 * L("-") * digits2 * L("-") * digits2).term(TDate)
     end
 
-  // TODO parse entries individually
   fun entries(): Parser val =>
     recover
-      let chars = R(' ').many1()
-      (L("- ") * chars * (L("\n") * chars).many()).term(TEntries)
+      let line = Forward
+      line() = L("\n") / (Unicode * line)
+      let sep = L("-") / L("#") / L("\n")
+      let entry = L("- ") * line * (not sep * line).many()
+      (entry.term(TEntry) * -L("\n").many()).many1().node(TEntries)
     end
 
   fun digits(): Parser val => recover digit().many1() end
 
   fun digit(): Parser val => recover R('0', '9') end
-
-primitive THeading is Label fun text(): String => "Heading"
 
 trait val TSection is Label
 primitive Fixed is TSection fun text(): String => "Fixed"
@@ -72,3 +73,4 @@ primitive TRelease is Label fun text(): String => "Release"
 primitive TVersion is Label fun text(): String => "Version"
 primitive TDate is Label fun text(): String => "Date"
 primitive TEntries is Label fun text(): String => "Entries"
+primitive TEntry is Label fun text(): String => "Entry"

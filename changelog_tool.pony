@@ -13,7 +13,14 @@ class ChangelogTool
   fun verify() =>
     _env.out.print("verifying " + _filename + "...")
     try
-      _parse()?
+      let ast = _parse()?
+
+      // TODO:
+      // let changelog = Changelog(ast)?
+      // _env.out.print(changelog.string())
+      // try changelog .> create_release("0.0.0", "0000-00-00")
+      // else _env.out.print("fail.")
+      // end
       _env.out.print(_filename + " is a valid changelog")
     end
 
@@ -23,7 +30,7 @@ class ChangelogTool
       let date = Date(Time.seconds()).format("%Y-%m-%d")
       let changelog: String =
         Changelog(_parse()?)?
-          .> create_release(version, date)?
+          .> create_release(version, date)
           .string()
       _edit_or_print(edit, changelog)
     else
