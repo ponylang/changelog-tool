@@ -12,7 +12,7 @@ actor Main is TestList
     test(_TestParseEntries)
     test(_TestParseHead)
     test(_TestParseChangelog)
-    test(_TestSingleRelease)
+    test(_TestRelease)
 
 
 class iso _TestParseVersion is UnitTest
@@ -47,23 +47,47 @@ class iso _TestParseEntries is UnitTest
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.entries()).run(
       [ ("32-bit ARM port.", "")
-        ("- 32-bit ARM port.", "(Entries - 32-bit ARM port.)\n")
-        ("- abc\n  - def\n\n", "(Entries - abc\n  - def)\n")
+        ( "- 32-bit ARM port.\n",
+          "(Entries\n  (Entry - 32-bit ARM port.\n)\n)\n" )
+        ("- abc\n  - def\n\n", "(Entries\n  (Entry - abc\n  - def\n)\n)\n")
         ( """
           - abc
             - def
               - ghi
+
             - jkl
           """,
-          "(Entries - abc\n  - def\n    - ghi\n  - jkl)\n" )
-        ( "- @fowles: handle regex empty match.",
-          "(Entries - @fowles: handle regex empty match.)\n" )
-        ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))",
-          "(Entries - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498)))\n" )
+          "(Entries\n  (Entry - abc\n  - def\n    - ghi\n)\n)\n" )
+        ( "- @fowles: handle regex empty match.\n",
+          "(Entries\n  (Entry - @fowles: handle regex empty match.\n)\n)\n" )
+        ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n",
+          "(Entries\n  (Entry - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n)\n)\n" )
+        ( """
+          - stuff
+
+          - things
+
+
+
+          - more things
+
+          #
+          """,
+          """
+          (Entries
+            (Entry - stuff
+          )
+            (Entry - things
+          )
+            (Entry - more things
+          )
+          )
+          """
+        )
       ])
 
 class iso _TestParseHead is UnitTest
-  fun name(): String => "parse heading"
+  fun name(): String => "parse head"
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.head()).run(
@@ -73,7 +97,7 @@ class iso _TestParseHead is UnitTest
           All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
           """,
           """
-          (Heading # Change Log
+          ( # Change Log
 
           All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
           )
@@ -86,7 +110,7 @@ class iso _TestParseHead is UnitTest
           ## [unreleased] - unreleased
           """,
           """
-          (Heading # Change Log
+          ( # Change Log
 
           Some other text
           )
@@ -100,7 +124,7 @@ class iso _TestParseHead is UnitTest
           ## [unreleased] - unreleased
           """,
           """
-          (Heading # Change Log
+          ( # Change Log
 
           Some other text that contains:
           `## [unreleased] - unreleased`
@@ -139,15 +163,13 @@ class iso _TestParseChangelog is UnitTest
       h.fail()
     end
 
-class iso _TestSingleRelease is UnitTest
-  fun name(): String => "single release"
+class iso _TestRelease is UnitTest
+  fun name(): String => "release"
 
   fun apply(h: TestHelper) ? =>
-    _OutputTest(h, ChangelogParser()).run(
+    _ReleaseTest(h, ChangelogParser()).run(
       """
       # Change Log
-
-      All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
       ## [unreleased] - unreleased
 
@@ -158,7 +180,6 @@ class iso _TestSingleRelease is UnitTest
       ### Added
 
 
-
       ### Changed
 
 
@@ -166,13 +187,54 @@ class iso _TestSingleRelease is UnitTest
       """
       # Change Log
 
-      All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
-
       ## [0.0.0] - 0000-00-00
 
       ### Fixed
 
       - Fix invalid separator in PONYPATH for Windows. ([PR #32](https://github.com/ponylang/pony-stable/pull/32))
+
+      """)?
+
+    _ReleaseTest(h, ChangelogParser()).run(
+      """
+      # Change Log
+
+      ## [unreleased] - unreleased
+
+      ### Fixed
+
+      - abc
+
+      - def
+
+      ### Added
+
+
+
+      ### Changed
+
+      ## [1.2.3] - 9999-99-99
+
+      ### Added
+
+      - yup
+
+      """,
+      """
+      # Change Log
+
+      ## [0.0.0] - 0000-00-00
+
+      ### Fixed
+
+      - abc
+      - def
+
+      ## [1.2.3] - 9999-99-99
+
+      ### Added
+
+      - yup
 
       """)?
 
@@ -200,7 +262,7 @@ class ParseTest
       end
     end
 
-class _OutputTest
+class _ReleaseTest
   let _h: TestHelper
   let _parser: Parser
 
@@ -213,10 +275,10 @@ class _OutputTest
     | (let n: USize, let r: (AST | Token | NotPresent)) =>
       match r
       | let ast: AST =>
-        let changelog =
-          Changelog(ast)? .> create_release("0.0.0", "0000-00-00")?
-        let output: String = changelog.string()
         _h.log(recover val Printer(ast) end)
+        // _h.log(Changelog(ast)?.string())
+        let changelog = Changelog(ast)? .> create_release("0.0.0", "0000-00-00")
+        let output: String = changelog.string()
         _h.log(output)
         _h.assert_eq[String](expected, output)
       else

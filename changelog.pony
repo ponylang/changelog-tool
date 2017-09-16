@@ -19,22 +19,10 @@ class Changelog
       unreleased = None
     end
 
-  fun ref create_release(version: String, date: String) ? =>
+  fun ref create_release(version: String, date: String) =>
     match unreleased
     | let r: Release =>
       r.heading = "## [" + version + "] - " + date
-
-      if (r.fixed as Section).entries == "" then
-        r.fixed = None
-      end
-      if (r.added as Section).entries == "" then
-        r.added = None
-      end
-      if (r.changed as Section).entries == "" then
-        r.changed = None
-      end
-    else
-      this
     end
 
   fun ref create_unreleased() =>
@@ -58,53 +46,67 @@ class Release
   var added: (Section | None)
   var changed: (Section | None)
 
+  let _unreleased_heading: String = "## [unreleased] - unreleased"
+
   new create(ast: AST) ? =>
-    let t = ast.children(0)? as Token
-    heading = t.source.content.trim(t.offset, t.offset + t.length)
+    heading = (ast.children(0)? as Token).string()
     fixed = try Section(ast.children(1)? as AST)? else None end
     added = try Section(ast.children(2)? as AST)? else None end
     changed = try Section(ast.children(3)? as AST)? else None end
 
   new _unreleased() =>
-    heading = "## [unreleased] - unreleased"
-    fixed = Section._emtpy(Fixed)
-    added = Section._emtpy(Added)
-    changed = Section._emtpy(Changed)
+    heading = _unreleased_heading
+    fixed = Section._empty(Fixed)
+    added = Section._empty(Added)
+    changed = Section._empty(Changed)
 
   fun string(): String iso^ =>
-    let str = recover String .> append(heading) .> append("\n\n") end
-    for section in [fixed; added; changed].values() do
-      match section
-      | let s: this->Section =>
-        str .> append(s.string()) .> append("\n\n")
+    if heading == _unreleased_heading then
+      "\n\n".join(
+        [ heading
+          "### Fixed\n"
+          "### Added\n"
+          "### Changed\n"
+          ""
+        ].values())
+    else
+      let str = recover String .> append(heading) .> append("\n\n") end
+      for section in [fixed; added; changed].values() do
+        match section
+        | let s: Section box =>
+          str .> append(s.string()) .> append("\n")
+        end
       end
+      str
     end
-    str
 
 class Section
   let label: TSection
-  let entries: String
+  embed entries: Array[String]
 
   new create(ast: AST) ? =>
     label = (ast.children(0)? as Token).label() as TSection
-    entries =
-      try
-        let t = ast.children(1)? as Token
-        t.source.content.trim(t.offset, t.offset + t.length)
-      else
-        ""
-      end
+    let es = ast.children(1)? as AST
+    entries = Array[String](es.size())
 
-  new _emtpy(label': TSection) =>
-    (label, entries) = (label', "")
+    for entry in es.children.values() do
+      try entries.push((entry as Token).string()) end
+    end
 
-  fun is_empty(): Bool => entries == ""
+  new _empty(label': TSection) =>
+    (label, entries) = (label', Array[String])
+
+  fun is_empty(): Bool => entries.size() == 0
 
   fun string(): String =>
+    let entries' = recover String end
+    for entry in entries.values() do
+      entries'.append(entry)
+    end
     recover
       String
         .> append("### ")
         .> append(label.text())
         .> append("\n\n")
-        .> append(entries)
+        .> append(consume entries')
     end
