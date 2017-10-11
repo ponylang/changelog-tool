@@ -1,5 +1,5 @@
 # changelog-tool
-Tool for modifying the ponyc changelog
+A tool for modifying the "standard pony" changelog
 
 ## Installation
 The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
