@@ -32,6 +32,7 @@ class Changelog
 
   fun string(): String iso^ =>
     let str = (recover String end)
+      .> append("# Change Log\n")
       .> append(heading)
       .> append("\n")
     if unreleased isnt None then str.append(unreleased.string()) end

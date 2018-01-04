@@ -8,8 +8,9 @@ primitive ChangelogParser
 
   fun head(): Parser val =>
     recover
-      (not L("\n## [") * Unicode).many().term()
-        * -L("\n").opt()
+      -L("# Change Log\n") *
+        (not L("\n## [") * Unicode).many().term()
+          * -L("\n").opt()
     end
 
   fun release(released: Bool = true): Parser val =>
