@@ -13,8 +13,8 @@ class ChangelogTool
   fun verify() ? =>
     let ast = _parse()?
     // TODO:
-    // let changelog = Changelog(ast)?
-    // _env.out.print(changelog.string())
+    let changelog = Changelog(ast)?
+    _env.out.print(changelog.string())
     // try changelog .> create_release("0.0.0", "0000-00-00")
     // else _env.out.print("fail.")
     // end

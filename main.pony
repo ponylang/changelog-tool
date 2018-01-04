@@ -19,10 +19,16 @@ actor Main
   new create(env: Env) =>
     // TODO use the cli package
 
+    if env.args.size() == 1 then
+      env.out.print(help_text)
+      return
+    end
+
     (let cmd, let filename) =
       try (env.args(1)?, env.args(2)?)
       else
         env.out.print(help_text)
+        env.exitcode(1)
         return
       end
 
