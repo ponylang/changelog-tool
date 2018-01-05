@@ -8,11 +8,11 @@ actor Main is TestList
   new create(env: Env) => PonyTest(env, this)
 
   fun tag tests(test: PonyTest) =>
-    // test(_TestParseVersion)
-    // test(_TestParseDate)
-    // test(_TestParseEntries)
+    test(_TestParseVersion)
+    test(_TestParseDate)
+    test(_TestParseEntries)
     test(_TestParseHead)
-    // test(_TestParseChangelog)
+    test(_TestParseChangelog)
     test(_TestRelease)
 
 class iso _TestParseVersion is UnitTest

@@ -1,3 +1,4 @@
+use "debug"
 use "files"
 use "peg"
 use "time"
@@ -12,12 +13,9 @@ class ChangelogTool
 
   fun verify() ? =>
     let ast = _parse()?
-    // TODO:
     let changelog = Changelog(ast)?
-    _env.out.print(changelog.string())
-    // try changelog .> create_release("0.0.0", "0000-00-00")
-    // else _env.out.print("fail.")
-    // end
+    Debug(recover Printer(ast) end)
+    Debug(changelog.string())
 
   fun release(version: String, edit: Bool) ? =>
     _check_version(version)?

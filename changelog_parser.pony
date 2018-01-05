@@ -3,7 +3,7 @@ use "peg"
 primitive ChangelogParser
   fun apply(): Parser val =>
     recover
-      head() * release(false).opt() * release().many()
+      (head() * release(false).opt() * release().many()).eof()
     end
 
   fun head(): Parser val =>

@@ -16,7 +16,9 @@ install:
 test: deps
 	cd tests && \
 		stable env ponyc -d -V1 && ./tests && \
-		rm tests && cd ..
+		rm tests && \
+		sh verification.sh && \
+		cd ..
 
 clean:
 	rm -rf bin
