@@ -1,3 +1,4 @@
+use "debug"
 use "files"
 use "peg"
 use "time"
@@ -10,39 +11,28 @@ class ChangelogTool
   new create(env: Env, filename: String, filepath: FilePath) =>
     (_env, _filename, _filepath) = (env, filename, filepath)
 
-  fun verify() =>
-    _env.out.print("verifying " + _filename + "...")
-    try
-      let ast = _parse()?
+  fun verify() ? =>
+    let ast = _parse()?
+    let changelog = Changelog(ast)?
+    Debug(recover Printer(ast) end)
+    Debug(changelog.string())
 
-      // TODO:
-      // let changelog = Changelog(ast)?
-      // _env.out.print(changelog.string())
-      // try changelog .> create_release("0.0.0", "0000-00-00")
-      // else _env.out.print("fail.")
-      // end
-      _env.out.print(_filename + " is a valid changelog")
-    end
-
-  fun release(version: String, edit: Bool) =>
-    try
-      _check_version(version)?
-      let date = Date(Time.seconds()).format("%Y-%m-%d")
-      let changelog: String =
-        Changelog(_parse()?)?
-          .> create_release(version, date)
-          .string()
-      _edit_or_print(edit, changelog)
-    else
-      _env.err.print("unable to perform release prep")
-    end
+  fun release(version: String, edit: Bool) ? =>
+    _check_version(version)?
+    let date = Date(Time.seconds()).format("%Y-%m-%d")
+    let changelog: String =
+      Changelog(_parse()?)?
+        .> create_release(version, date)
+        .string()
+    _edit_or_print(edit, changelog)
 
   fun _check_version(version: String) ? =>
     let source = Source.from_string(version)
     match recover val ChangelogParser.version().parse(source) end
     | (_, let t: Token) => None
     else
-      _env.err.print("invalid version number: '" + version + "'")
+      _env.out.print("invalid version number: '" + version + "'")
+      _env.exitcode(1)
       error
     end
 
@@ -77,9 +67,11 @@ class ChangelogTool
       ast
     | (let offset: USize, let r: Parser val) =>
       let e = recover val SyntaxError(source, offset, r) end
-      _env.err.writev(PegFormatError.console(e))
+      _env.out.writev(PegFormatError.console(e))
+      _env.exitcode(1)
       error
     else
-      _env.err.print("unable to parse file: " + _filename)
+      _env.out.print("unable to parse file: " + _filename)
+      _env.exitcode(1)
       error
     end

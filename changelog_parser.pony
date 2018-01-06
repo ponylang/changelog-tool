@@ -3,13 +3,13 @@ use "peg"
 primitive ChangelogParser
   fun apply(): Parser val =>
     recover
-      head() * release(false).opt() * release().many()
+      (head() * release(false).opt() * release().many()).eof()
     end
 
   fun head(): Parser val =>
     recover
-      (not L("\n## [") * Unicode).many().term()
-        * -L("\n").opt()
+      let para = not L("#") * (not L("\n") * Unicode).many1().term()
+      -L("# Change Log\n\n") * para.opt() * -L("\n").many()
     end
 
   fun release(released: Bool = true): Parser val =>

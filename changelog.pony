@@ -9,7 +9,17 @@ class Changelog
     let children = ast.children.values()
     released = Array[Release]
 
-    heading = (children.next()? as Token).string()
+    heading =
+      if children.has_next() then
+        match children.next()?
+        | let t: Token => t.string()
+        | NotPresent => ""
+        else error
+        end
+      else
+        ""
+      end
+
     if ast.size() > 1 then
       unreleased = try Release(children.next()? as AST)? end
       for child in children do
@@ -32,8 +42,12 @@ class Changelog
 
   fun string(): String iso^ =>
     let str = (recover String end)
-      .> append(heading)
-      .> append("\n")
+      .> append("# Change Log\n\n")
+    if heading != "" then
+      str
+        .> append(heading)
+        .> append("\n\n")
+    end
     if unreleased isnt None then str.append(unreleased.string()) end
     for release in released.values() do
       str.append(release.string())

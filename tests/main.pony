@@ -1,3 +1,4 @@
+use "collections"
 use "files"
 use "peg"
 use "ponytest"
@@ -14,14 +15,13 @@ actor Main is TestList
     test(_TestParseChangelog)
     test(_TestRelease)
 
-
 class iso _TestParseVersion is UnitTest
   fun name(): String => "parse version"
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.version()).run(
-      [ ("0.0.0", "(Version 0.0.0)\n")
-        ("1.23.9", "(Version 1.23.9)\n")
+      [ ("0.0.0", "$(Version$0.0.0)")
+        ("1.23.9", "$(Version$1.23.9)")
         ("0..0", "")
         (".0.0", "")
         ("0..", "")
@@ -33,8 +33,8 @@ class iso _TestParseDate is UnitTest
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.date()).run(
-      [ ("2017-04-07", "(Date 2017-04-07)\n")
-        ("0000-00-00", "(Date 0000-00-00)\n")
+      [ ("2017-04-07", "$(Date$2017-04-07)")
+        ("0000-00-00", "$(Date$0000-00-00)")
         ("0000-00-0", "")
         ("0000-0-00", "")
         ("000-00-00", "")
@@ -48,8 +48,8 @@ class iso _TestParseEntries is UnitTest
     ParseTest(h, ChangelogParser.entries()).run(
       [ ("32-bit ARM port.", "")
         ( "- 32-bit ARM port.\n",
-          "(Entries\n  (Entry - 32-bit ARM port.\n)\n)\n" )
-        ("- abc\n  - def\n\n", "(Entries\n  (Entry - abc\n  - def\n)\n)\n")
+          "$(Entries$(Entry$- 32-bit ARM port.\n))" )
+        ("- abc\n  - def\n\n", "$(Entries$(Entry$- abc\n  - def\n))")
         ( """
           - abc
             - def
@@ -57,11 +57,11 @@ class iso _TestParseEntries is UnitTest
 
             - jkl
           """,
-          "(Entries\n  (Entry - abc\n  - def\n    - ghi\n)\n)\n" )
+          "$(Entries$(Entry$- abc\n  - def\n    - ghi\n))" )
         ( "- @fowles: handle regex empty match.\n",
-          "(Entries\n  (Entry - @fowles: handle regex empty match.\n)\n)\n" )
+          "$(Entries$(Entry$- @fowles: handle regex empty match.\n))" )
         ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n",
-          "(Entries\n  (Entry - Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n)\n)\n" )
+          "$(Entries$(Entry$- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n))" )
         ( """
           - stuff
 
@@ -73,16 +73,7 @@ class iso _TestParseEntries is UnitTest
 
           #
           """,
-          """
-          (Entries
-            (Entry - stuff
-          )
-            (Entry - things
-          )
-            (Entry - more things
-          )
-          )
-          """
+          "$(Entries$(Entry$- stuff\n)$(Entry$- things\n)$(Entry$- more things\n))"
         )
       ])
 
@@ -96,12 +87,8 @@ class iso _TestParseHead is UnitTest
 
           All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
           """,
-          """
-          ( # Change Log
-
-          All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
-          )
-          """)
+          "$($All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).)"
+        )
         ( """
           # Change Log
 
@@ -109,27 +96,32 @@ class iso _TestParseHead is UnitTest
 
           ## [unreleased] - unreleased
           """,
-          """
-          ( # Change Log
-
-          Some other text
-          )
-          """ )
+          "$($Some other text)"
+        )
         ( """
           # Change Log
 
-          Some other text that contains:
-          `## [unreleased] - unreleased`
+          Some other text that contains: `## [unreleased] - unreleased`
 
           ## [unreleased] - unreleased
           """,
-          """
-          ( # Change Log
+          "$($Some other text that contains: `## [unreleased] - unreleased`)"
+        )
+        ( """
+          # Change Log
 
-          Some other text that contains:
-          `## [unreleased] - unreleased`
-          )
-          """ )
+
+          ## [unreleased] - unreleased
+          """,
+          "$()"
+        )
+        ( """
+          # Change Log
+
+          ## [unreleased] - unreleased
+          """,
+          "$()"
+        )
       ])
 
 class iso _TestParseChangelog is UnitTest
@@ -151,7 +143,7 @@ class iso _TestParseChangelog is UnitTest
           let changelog = Changelog(ast)?
           h.assert_eq[String](source, changelog.string())
         else
-          h.log(recover val Printer(r) end)
+          h.log(recover val _Printer(r) end)
           h.fail()
         end
       | (let offset: USize, let r: Parser val) =>
@@ -251,7 +243,8 @@ class ParseTest
       let source' = Source.from_string(source)
       match recover val _parser.parse(source') end
       | (_, let r: (AST | Token | NotPresent)) =>
-        let result = recover val Printer(r) end
+        let result = recover val _Printer(r) end
+        _h.log(recover Printer(r) end)
         _h.assert_eq[String](expected, result)
       | (let offset: USize, let r: Parser val) =>
         let e = recover val SyntaxError(source', offset, r) end
@@ -275,14 +268,14 @@ class _ReleaseTest
     | (let n: USize, let r: (AST | Token | NotPresent)) =>
       match r
       | let ast: AST =>
-        _h.log(recover val Printer(ast) end)
+        _h.log(recover val _Printer(ast) end)
         // _h.log(Changelog(ast)?.string())
         let changelog = Changelog(ast)? .> create_release("0.0.0", "0000-00-00")
         let output: String = changelog.string()
         _h.log(output)
         _h.assert_eq[String](expected, output)
       else
-        _h.log(recover val Printer(r) end)
+        _h.log(recover val _Printer(r) end)
         _h.fail()
       end
     | (let offset: USize, let r: Parser val) =>
@@ -302,3 +295,22 @@ primitive _Logv
         end)
     end
     h.log(consume str)
+
+primitive _Printer
+  fun apply(p: ASTChild, depth: USize = 0, indent: String = "  ",
+    s: String ref = String): String ref
+  =>
+    s.append("$(")
+    s.append(p.label().text())
+
+    match p
+    | let ast: AST =>
+      for child in ast.children.values() do
+        _Printer(child, depth + 1, indent, s)
+      end
+    | let token: Token =>
+      s.append("$")
+      s.append(token.source.content, token.offset, token.length)
+    end
+    s.append(")")
+    s

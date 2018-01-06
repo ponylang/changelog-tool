@@ -7,7 +7,7 @@ deps:
 
 bin/changelog-tool: deps
 	mkdir -p bin
-	stable env ponyc -o bin
+	stable env ponyc -V1 -o bin
 
 install:
 	mkdir -p $(prefix)/bin
@@ -15,8 +15,10 @@ install:
 
 test: deps
 	cd tests && \
-		stable env ponyc -d && ./tests && \
-		rm tests && cd ..
+		stable env ponyc -d -V1 && ./tests && \
+		rm tests && \
+		sh verification.sh && \
+		cd ..
 
 clean:
 	rm -rf bin
