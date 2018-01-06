@@ -21,7 +21,9 @@ class iso _TestParseVersion is UnitTest
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.version()).run(
       [ ("0.0.0", "$(Version$0.0.0)")
+        ("0.0", "$(Version$0.0)")
         ("1.23.9", "$(Version$1.23.9)")
+        ("1.23", "$(Version$1.23)")
         ("0..0", "")
         (".0.0", "")
         ("0..", "")
@@ -52,20 +54,20 @@ class iso _TestParseEntries is UnitTest
         ("- abc\n  - def\n\n", "$(Entries$(Entry$- abc\n  - def\n))")
         ( """
           - abc
-            - def
+            * def
               - ghi
 
             - jkl
           """,
-          "$(Entries$(Entry$- abc\n  - def\n    - ghi\n))" )
+          "$(Entries$(Entry$- abc\n  * def\n    - ghi\n))" )
         ( "- @fowles: handle regex empty match.\n",
           "$(Entries$(Entry$- @fowles: handle regex empty match.\n))" )
         ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n",
           "$(Entries$(Entry$- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n))" )
         ( """
-          - stuff
+          * stuff
 
-          - things
+          * things
 
 
 
@@ -73,7 +75,7 @@ class iso _TestParseEntries is UnitTest
 
           #
           """,
-          "$(Entries$(Entry$- stuff\n)$(Entry$- things\n)$(Entry$- more things\n))"
+          "$(Entries$(Entry$* stuff\n)$(Entry$* things\n)$(Entry$- more things\n))"
         )
       ])
 

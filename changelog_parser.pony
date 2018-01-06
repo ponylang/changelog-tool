@@ -41,7 +41,7 @@ primitive ChangelogParser
   fun version(): Parser val =>
     recover
       let frac = L(".") * digits()
-      (digits() * frac * frac).term(TVersion)
+      (digits() * frac * frac.opt()).term(TVersion)
     end
 
   fun date(): Parser val =>
@@ -53,10 +53,11 @@ primitive ChangelogParser
 
   fun entries(): Parser val =>
     recover
+      let bullet = L("-") / L("*")
       let line = Forward
       line() = L("\n") / (Unicode * line)
-      let sep = L("-") / L("#") / L("\n")
-      let entry = L("- ") * line * (not sep * line).many()
+      let sep = bullet / L("#") / L("\n")
+      let entry = bullet * L(" ") * line * (not sep * line).many()
       (entry.term(TEntry) * -L("\n").many()).many1().node(TEntries)
     end
 
