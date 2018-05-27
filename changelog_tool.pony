@@ -19,7 +19,7 @@ class ChangelogTool
 
   fun release(version: String, edit: Bool) ? =>
     _check_version(version)?
-    let date = Date(Time.seconds()).format("%Y-%m-%d")
+    let date = PosixDate(Time.seconds()).format("%Y-%m-%d")
     let changelog: String =
       Changelog(_parse()?)?
         .> create_release(version, date)
