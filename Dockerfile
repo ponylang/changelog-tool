@@ -1,4 +1,4 @@
-FROM ponylang/ponyc:master
+FROM ponylang/ponyc:latest
 
 WORKDIR /src/changelog-tool
 
