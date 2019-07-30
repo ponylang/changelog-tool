@@ -22,11 +22,22 @@ jobs:
       - zulip/status:
           fail_only: true
 
+  verify-changelog:
+    docker:
+      - image: ponylang/changelog-tool:release
+    steps:
+      - checkout
+      - run: changelog-tool verify CHANGELOG.md
+      - zulip/status:
+          fail_only: true
+
 workflows:
   version: 2.1
   commit:
     jobs:
       - vs-ponyc-release:
+          context: org-global
+      - verify-changelog:
           context: org-global
 
   nightly:
