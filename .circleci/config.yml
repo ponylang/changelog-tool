@@ -26,7 +26,7 @@ workflows:
   version: 2.1
   commit:
     jobs:
-      - vs-ponyc-master:
+      - vs-ponyc-release:
           context: org-global
 
   nightly:
