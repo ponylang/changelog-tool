@@ -5,6 +5,11 @@ class Changelog
   var unreleased: (Release | None)
   embed released: Array[Release]
 
+  new empty(heading': String) =>
+    heading = heading'
+    unreleased = None
+    released = []
+
   new create(ast: AST) ? =>
     let children = ast.children.values()
     released = Array[Release]

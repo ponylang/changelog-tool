@@ -1,16 +1,24 @@
 #!/bin/sh
 
 echo_red() {
-  echo -e "\x1b[31;1m$1\x1b[0m"
+  printf "\x1b[31;1m%s\x1b[0m\n" "$1"
+}
+
+echo_green() {
+  printf "\x1b[32;1m%s\x1b[0m\n" "$1"
 }
 
 stable env ponyc -d -V1 .. -b changelog-tool
 
 for f in bad-changelogs/*.md; do
-  if ./changelog-tool verify "$f"; then
+  if ./changelog-tool verify -f="$f"; then
     echo_red "changelog-tool failed to catch bad changelog: $f"
     exit 1
   fi
 done
 
 rm changelog-tool
+
+printf "\n"
+echo_green "All verification tests have passed."
+printf "\n"
