@@ -24,8 +24,19 @@ changelog-tool verify
 CHANGELOG.md is a valid changelog.
 ```
 
+## Add an unreleased section
+```bash
+changelog-tool unreleased -e
+```
+
 ## Prepare a Changelog for a Release
-CHANGELOG.md:
+```bash
+changelog-tool release 0.13.1
+# The changelog-tool release command prints the new changelog to standard output
+# -e should be used to modify the changelog file.
+```
+
+Example CHANGELOG.md (before):
 ```markdown
 # Change Log
 
@@ -47,12 +58,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ```
 
-```bash
-changelog-tool release 0.13.1
-# The changelog-tool release command prints the new changelog to standard output
-# -e should be used to modify the file in changelog file.
-```
-
+Example CHANGELOG.md (after):
 ```
 # Change Log
 
@@ -67,8 +73,3 @@ All notable changes to the Pony compiler and standard library will be documented
 ```
 
 Note that a new unreleased area has been added to the top of the changelog and only the `Added` section of the previous unreleased area has been included in the 0.13.1 release since the other two sections had no entries.
-
-An empty unreleased section may then be added with the command
-```bash
-changelog-tool unreleased CHANGELOG.md -e
-```
