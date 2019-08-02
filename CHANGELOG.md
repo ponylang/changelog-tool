@@ -10,12 +10,11 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 
 - Version command to print version
-
 - New command for creating empty changelogs
 
 ### Changed
 
-- The changelog file name has become an optional argument
+- The CLI interface has been changed, notably the positional file name argument has become an optional argument
 
 ## [0.2.2] - 2018-01-16
 
