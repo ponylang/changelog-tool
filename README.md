@@ -24,6 +24,19 @@ changelog-tool verify
 CHANGELOG.md is a valid changelog.
 ```
 
+## Print a single release changelog
+```bash
+changelog-tool get 0.2.2
+```
+```markdown
+## [0.2.2] - 2018-01-16
+
+### Added
+
+- Many prior version. This was added as first entry in CHANGELOG when it was added to this project.
+
+```
+
 ## Add an unreleased section
 ```bash
 changelog-tool unreleased -e

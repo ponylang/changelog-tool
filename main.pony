@@ -54,6 +54,11 @@ actor Main
         CommandSpec.leaf("new", "Create an new, empty changelog")?
         CommandSpec.leaf("verify", "Verify that a changelog is valid")?
         CommandSpec.leaf(
+          "get",
+          "Print the changelog sections for a selected release",
+          [],
+          [ArgSpec.string("selection")])?
+        CommandSpec.leaf(
           "unreleased",
           "Add unreleased section to changelog if none exists",
           [edit])?
@@ -83,6 +88,8 @@ actor Main
     | "changelog-tool/version" => print("changelog-tool " + Info.version())
     | "changelog-tool/new" => cmd_new(path, filename)
     | "changelog-tool/verify" => cmd_verify(path, filename)
+    | "changelog-tool/get" =>
+      cmd_get(path, filename, cmd.arg("selection").string())
     | "changelog-tool/unreleased" =>
       cmd_unreleased(path, filename, cmd.option("edit").bool())
     | "changelog-tool/release" =>
@@ -109,6 +116,29 @@ actor Main
     else
       err(filename + " is not a valid changelog.")
     end
+
+  fun cmd_get(filepath: FilePath, filename: String, selection: String) =>
+    let changelog =
+      try
+        Changelog(parse(filepath, filename)?)?
+      else
+        err(filename + " is not a valid changelog.")
+        return
+      end
+
+    let sections = changelog.released
+    match changelog.unreleased
+    | let r: Release => sections.push(r)
+    end
+
+    for section in sections.values() do
+      if section.heading.contains(selection) then
+        print(section.string())
+        return
+      end
+    end
+
+    err("\"" + selection + "\" was not found in any changelog release headings")
 
   fun cmd_unreleased(filepath: FilePath, filename: String, edit: Bool) =>
     try
