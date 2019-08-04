@@ -11,21 +11,49 @@ make
 sudo make install
 ```
 
+## Create a Changelog
+```bash
+changelog-tool new
+```
+
 ## Verify a Changelog
 ```bash
-changelog-tool verify CHANGELOG.md 
+changelog-tool verify
 ```
 ```
-verifying CHANGELOG.md...
-CHANGELOG.md is a valid changelog
+CHANGELOG.md is a valid changelog.
+```
+
+## Print a single release changelog
+```bash
+changelog-tool get 0.2.2
+```
+```markdown
+## [0.2.2] - 2018-01-16
+
+### Added
+
+- Many prior version. This was added as first entry in CHANGELOG when it was added to this project.
+
+```
+
+## Add an unreleased section
+```bash
+changelog-tool unreleased -e
 ```
 
 ## Prepare a Changelog for a Release
-CHANGELOG.md:
+```bash
+changelog-tool release 0.13.1
+# The changelog-tool release command prints the new changelog to standard output
+# -e should be used to modify the changelog file.
+```
+
+Example CHANGELOG.md (before):
 ```markdown
 # Change Log
 
-All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
+All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
 ## [unreleased] - unreleased
 
@@ -43,12 +71,7 @@ All notable changes to the Pony compiler and standard library will be documented
 
 ```
 
-```bash
-changelog-tool release CHANGELOG.md 0.13.1
-# The changelog-tool release command prints the new changelog to standard output
-# -e should be used to modify the file in changelog file.
-```
-
+Example CHANGELOG.md (after):
 ```
 # Change Log
 
@@ -63,8 +86,3 @@ All notable changes to the Pony compiler and standard library will be documented
 ```
 
 Note that a new unreleased area has been added to the top of the changelog and only the `Added` section of the previous unreleased area has been included in the 0.13.1 release since the other two sections had no entries.
-
-An empty unreleased section may then be added with the command
-```bash
-changelog-tool unreleased CHANGELOG.md -e
-```
