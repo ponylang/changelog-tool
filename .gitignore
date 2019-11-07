@@ -1,4 +1,5 @@
 .DS_Store
 *.dSYM
 .deps/
-bin/
+/build/
+/changelog-tool/version.pony
