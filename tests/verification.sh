@@ -8,7 +8,7 @@ echo_green() {
   printf "\x1b[32;1m%s\x1b[0m\n" "$1"
 }
 
-stable env ponyc -d -V1 .. -b changelog-tool
+stable env ponyc -d -V1 ../changelog-tool -b changelog-tool
 
 for f in bad-changelogs/*.md; do
   if ./changelog-tool verify -f="$f"; then
