@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 
 
+- Switch Docker images using musl based changelog-tool ([PR #37](https://github.com/ponylang/changelog-tool/pull/37))
 ## [0.3.0] - 2019-08-03
 
 ### Added
