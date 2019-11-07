@@ -4,7 +4,7 @@ use peg = "peg"
 use "time"
 
 primitive Info
-  fun version(): String => "0.3.0"
+  fun version(): String => Version()
   fun default_filename(): String => "CHANGELOG.md"
   fun project_repo(): String => "https://github.com/ponylang/changelog-tool"
 

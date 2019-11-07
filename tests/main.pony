@@ -2,7 +2,7 @@ use "collections"
 use "files"
 use "peg"
 use "ponytest"
-use ".."
+use "../changelog-tool"
 
 actor Main is TestList
   new create(env: Env) => PonyTest(env, this)

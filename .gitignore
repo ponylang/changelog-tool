@@ -2,4 +2,3 @@
 *.dSYM
 .deps/
 bin/
-changelog-tool
