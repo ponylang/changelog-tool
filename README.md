@@ -1,7 +1,9 @@
 # changelog-tool
+
 A tool for modifying the "standard pony" changelog
 
 ## Installation
+
 The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
 
 ```bash
@@ -12,11 +14,13 @@ sudo make install
 ```
 
 ## Create a Changelog
+
 ```bash
 changelog-tool new
 ```
 
 ## Verify a Changelog
+
 ```bash
 changelog-tool verify
 ```
@@ -25,6 +29,7 @@ CHANGELOG.md is a valid changelog.
 ```
 
 ## Print a single release changelog
+
 ```bash
 changelog-tool get 0.2.2
 ```
@@ -38,11 +43,13 @@ changelog-tool get 0.2.2
 ```
 
 ## Add an unreleased section
+
 ```bash
 changelog-tool unreleased -e
 ```
 
 ## Prepare a Changelog for a Release
+
 ```bash
 changelog-tool release 0.13.1
 # The changelog-tool release command prints the new changelog to standard output
