@@ -45,6 +45,11 @@ class Changelog
       unreleased = Release._unreleased()
     end
 
+  fun ref add_entry(section_name: String, entry: String) ? =>
+    match unreleased
+    | let r: Release => r.add_entry(section_name, entry)?
+    end
+
   fun string(): String iso^ =>
     let str = (recover String end)
       .> append("# Change Log\n\n")
@@ -79,25 +84,25 @@ class Release
     added = Section._empty(Added)
     changed = Section._empty(Changed)
 
-  fun string(): String iso^ =>
-    if heading == _unreleased_heading then
-      "\n\n".join(
-        [ heading
-          "### Fixed\n"
-          "### Added\n"
-          "### Changed\n"
-          ""
-        ].values())
-    else
-      let str = recover String .> append(heading) .> append("\n\n") end
-      for section in [fixed; added; changed].values() do
-        match section
-        | let s: Section box =>
-          str .> append(s.string()) .> append("\n")
-        end
+  fun ref add_entry(section_name: String, entry: String) ? =>
+    let section =
+      match section_name
+      | "fixed" => try fixed as Section else fixed = Section._empty(Fixed); fixed as Section end
+      | "added" => try added as Section else added = Section._empty(Added); added as Section end
+      | "changed" => try changed as Section else changed = Section._empty(Changed); changed as Section end
+      else error
       end
-      str
+    section.entries.push("- " + entry)
+
+  fun string(): String iso^ =>
+    let str = recover String .> append(heading) .> append("\n\n") end
+    for section in [fixed; added; changed].values() do
+      match section
+      | let s: Section box =>
+        str .> append(s.string()) .> append("\n")
+      end
     end
+    str
 
 class Section
   let label: TSection
