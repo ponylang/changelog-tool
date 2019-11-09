@@ -137,14 +137,17 @@ actor Main
         return
       end
 
-    let sections = changelog.released
     match changelog.unreleased
-    | let r: Release => sections.push(r)
+    | let u: Unreleased =>
+      if u.heading.contains(selection) then
+        print(u.string())
+        return
+      end
     end
 
-    for section in sections.values() do
-      if section.heading.contains(selection) then
-        print(section.string())
+    for release in changelog.released.values() do
+      if release.heading.contains(selection) then
+        print(release.string())
         return
       end
     end
@@ -194,6 +197,7 @@ actor Main
         filepath,
         edit,
         Changelog(parse(filepath, filename)?)?
+          .> create_unreleased()
           .> add_entry(section, entry)?
           .string())
     else
