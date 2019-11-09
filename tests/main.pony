@@ -333,7 +333,6 @@ class _ReleaseTestAfterAddingSomeEntries
       match r
       | let ast: AST =>
         _h.log(recover val _Printer(ast) end)
-        // _h.log(Changelog(ast)?.string())
         let changelog = Changelog(ast)?
           .> add_entry("fixed", "We made some fixes...\n")?
           .> add_entry("fixed", "Oh, and we made a final one.\n")?

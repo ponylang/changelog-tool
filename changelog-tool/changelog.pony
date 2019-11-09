@@ -87,9 +87,15 @@ class Release
   fun ref add_entry(section_name: String, entry: String) ? =>
     let section =
       match section_name
-      | "fixed" => try fixed as Section else fixed = Section._empty(Fixed); fixed as Section end
-      | "added" => try added as Section else added = Section._empty(Added); added as Section end
-      | "changed" => try changed as Section else changed = Section._empty(Changed); changed as Section end
+      | "fixed" =>
+        if fixed is None then fixed = Section._empty(Fixed) end
+        fixed as Section
+      | "added" =>
+        if added is None then added = Section._empty(Added) end
+        added as Section
+      | "changed" =>
+        if changed is None then changed = Section._empty(Changed) end
+        changed as Section
       else error
       end
     section.entries.push("- " + entry)

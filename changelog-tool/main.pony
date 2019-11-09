@@ -75,7 +75,7 @@ actor Main
 	  "Add a new entry at the end of the section",
 	  [edit],
 	  [ ArgSpec.string("section")
-            ArgSpec.string("entry")
+      ArgSpec.string("entry")
 	  ])?
       ])?
       .> add_help("help", "Print this message and exit")?
@@ -103,7 +103,9 @@ actor Main
       cmd_release(
         path, filename, cmd.arg("version").string(), cmd.option("edit").bool())
     | "changelog-tool/add" =>
-      cmd_add(path, filename, cmd.arg("section").string(), cmd.arg("entry").string(), cmd.option("edit").bool())
+      cmd_add(
+        path, filename, cmd.arg("section").string(),
+        cmd.arg("entry").string(),cmd.option("edit").bool())
     else
       err("unknown command: " + cmd.fullname())
       please_report()
@@ -191,9 +193,9 @@ actor Main
       edit_or_print(
         filepath,
         edit,
-	Changelog(parse(filepath, filename)?)?
-	  .> add_entry(section, entry)?
-	  .string())
+        Changelog(parse(filepath, filename)?)?
+          .> add_entry(section, entry)?
+          .string())
     else
       err("unable add a new changelog entry")
     end
