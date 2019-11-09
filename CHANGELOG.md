@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 
 
+- Add "add" command ([PR #47](https://github.com/ponylang/changelog-tool/pull/47))
 ### Changed
 
 
