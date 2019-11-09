@@ -1,5 +1,4 @@
 use "peg"
-use "debug"
 
 class Changelog
   let heading: String
@@ -105,20 +104,23 @@ class Release
     // In order to represent the empty sections of unreleased releases,
     // we must use the empty correspoding section when printing instead
     // of None, otherwise it will be ignored.
-    let fixed' = match fixed
-    | None if heading == _unreleased_heading => Section._empty(Fixed)
-    else fixed
-    end
+    let fixed' =
+      match fixed
+        | None if heading == _unreleased_heading => Section._empty(Fixed)
+      else fixed
+      end
 
-    let added' = match added
-    | None if heading == _unreleased_heading => Section._empty(Added)
-    else added
-    end
+    let added' =
+      match added
+    |   None if heading == _unreleased_heading => Section._empty(Added)
+      else added
+      end
 
-    let changed' = match changed
-    | None if heading == _unreleased_heading => Section._empty(Changed)
-    else changed
-    end
+    let changed' =
+      match changed
+      | None if heading == _unreleased_heading => Section._empty(Changed)
+      else changed
+      end
 
     let str = recover String .> append(heading) .> append("\n\n") end
     for section in [fixed'; added'; changed'].values() do
