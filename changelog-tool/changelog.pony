@@ -1,8 +1,9 @@
+use "itertools"
 use "peg"
 
 class Changelog
   let heading: String
-  var unreleased: (Release | None)
+  var unreleased: (Unreleased | None)
   embed released: Array[Release]
 
   new empty(heading': String) =>
@@ -26,7 +27,7 @@ class Changelog
       end
 
     if ast.size() > 1 then
-      unreleased = try Release(children.next()? as AST)? end
+      unreleased = try Unreleased .> fill_ast(children.next()? as AST)? end
       for child in children do
         released.push(Release(child as AST)?)
       end
@@ -36,33 +37,70 @@ class Changelog
 
   fun ref create_release(version: String, date: String) =>
     match unreleased
-    | let r: Release =>
-      r.heading = "## [" + version + "] - " + date
+    | let u: Unreleased =>
+      released.unshift(u.release(
+        "".join(["## ["; version; "] - "; date].values())))
+      unreleased = None
+      None
     end
 
   fun ref create_unreleased() =>
     if unreleased is None then
-      unreleased = Release._unreleased()
+      unreleased = Unreleased
     end
 
   fun ref add_entry(section_name: String, entry: String) ? =>
     match unreleased
-    | let r: Release => r.add_entry(section_name, entry)?
+    | let u: Unreleased => u.add_entry(section_name, entry)?
     end
 
   fun string(): String iso^ =>
-    let str = (recover String end)
-      .> append("# Change Log\n\n")
-    if heading != "" then
-      str
-        .> append(heading)
-        .> append("\n\n")
-    end
-    if unreleased isnt None then str.append(unreleased.string()) end
-    for release in released.values() do
-      str.append(release.string())
-    end
-    str
+    "".join(
+      [ "# Change Log\n\n"
+        if heading == "" then "" else "".join([heading; "\n\n"].values()) end
+        if unreleased is None then "" else unreleased end
+        "".join(released.values())
+      ].values())
+
+class Unreleased
+  let heading: String = "## [unreleased] - unreleased"
+  var fixed: Section
+  var added: Section
+  var changed: Section
+
+  new create() =>
+    fixed = Section._empty(Fixed)
+    added = Section._empty(Added)
+    changed = Section._empty(Changed)
+
+  fun ref fill_ast(ast: AST) ? =>
+    if (ast.children(0)? as Token).string() != heading then error end
+    try fixed = Section(ast.children(1)? as AST)? end
+    try added = Section(ast.children(2)? as AST)? end
+    try changed = Section(ast.children(3)? as AST)? end
+
+  fun ref add_entry(section_name: String, entry: String) ? =>
+    let section =
+      match section_name
+      | "fixed" => fixed
+      | "added" => added
+      | "changed" => changed
+      else error
+      end
+    section.entries.push("".join(
+      [ "- "; entry
+        if entry.substring(-1) == "\n" then "" else "\n" end
+      ].values()))
+
+  fun ref release(heading': String): Release^ =>
+    let rel = Release._empty(heading')
+    if not fixed.is_empty() then rel.fixed = fixed end
+    if not added.is_empty() then rel.added = added end
+    if not changed.is_empty() then rel.changed = changed end
+    rel
+
+  fun string(): String iso^ =>
+    Releases.show(heading, [fixed; added; changed].values())
 
 class Release
   var heading: String
@@ -70,66 +108,31 @@ class Release
   var added: (Section | None)
   var changed: (Section | None)
 
-  let _unreleased_heading: String = "## [unreleased] - unreleased"
-
   new create(ast: AST) ? =>
     heading = (ast.children(0)? as Token).string()
     fixed = try Section(ast.children(1)? as AST)? else None end
     added = try Section(ast.children(2)? as AST)? else None end
     changed = try Section(ast.children(3)? as AST)? else None end
 
-  new _unreleased() =>
-    heading = _unreleased_heading
-    fixed = Section._empty(Fixed)
-    added = Section._empty(Added)
-    changed = Section._empty(Changed)
-
-  fun ref add_entry(section_name: String, entry: String) ? =>
-    let section =
-      match section_name
-      | "fixed" =>
-        if fixed is None then fixed = Section._empty(Fixed) end
-        fixed as Section
-      | "added" =>
-        if added is None then added = Section._empty(Added) end
-        added as Section
-      | "changed" =>
-        if changed is None then changed = Section._empty(Changed) end
-        changed as Section
-      else error
-      end
-    section.entries.push("- " + entry)
+  new _empty(heading': String) =>
+    heading = heading'
+    fixed = None
+    added = None
+    changed = None
 
   fun string(): String iso^ =>
-    // In order to represent the empty sections of unreleased releases,
-    // we must use the empty correspoding section when printing instead
-    // of None, otherwise it will be ignored.
-    let fixed' =
-      match fixed
-        | None if heading == _unreleased_heading => Section._empty(Fixed)
-      else fixed
-      end
+    Releases.show(heading, [fixed; added; changed].values())
 
-    let added' =
-      match added
-    |   None if heading == _unreleased_heading => Section._empty(Added)
-      else added
-      end
-
-    let changed' =
-      match changed
-      | None if heading == _unreleased_heading => Section._empty(Changed)
-      else changed
-      end
-
-    let str = recover String .> append(heading) .> append("\n\n") end
-    for section in [fixed'; added'; changed'].values() do
-      match section
-      | let s: Section box =>
-        str .> append(s.string()) .> append("\n")
-      end
-    end
-    str
+primitive Releases
+  fun show(heading: String, sections: Iterator[(Section box | None)])
+    : String iso^
+  =>
+    "\n".join(
+      [heading; ""]
+        .> concat(Iter[(Section box | None)](sections)
+          .filter_map[String]({(s)? => (s as Section box).string() }))
+        .> push("")
+        .values())
 
 class Section
   let label: TSection
@@ -149,15 +152,8 @@ class Section
 
   fun is_empty(): Bool => entries.size() == 0
 
-  fun string(): String =>
-    let entries' = recover String end
-    for entry in entries.values() do
-      entries'.append(entry)
-    end
-    recover
-      String
-        .> append("### ")
-        .> append(label.text())
-        .> append("\n\n")
-        .> append(consume entries')
-    end
+  fun string(): String iso^ =>
+    "".join(
+      [ "### "; label.text(); "\n\n"
+        "".join(entries.values())
+      ].values())
