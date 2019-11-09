@@ -232,6 +232,39 @@ class iso _TestRelease is UnitTest
 
       """)?
 
+    _ReleaseTestAfterAddingSomeEntries(h, ChangelogParser()).run(
+      """
+      # Change Log
+
+      ## [unreleased] - unreleased
+
+      ### Fixed
+
+      ### Added
+
+      ### Changed
+
+      """,
+      """
+      # Change Log
+
+      ## [0.0.0] - 0000-00-00
+
+      ### Fixed
+
+      - We made some fixes...
+      - Oh, and we made a final one.
+
+      ### Added
+
+      - We added some stuff as well.
+
+      ### Changed
+
+      - And we changed a few things also.
+
+      """)?
+
 class ParseTest
   let _h: TestHelper
   let _parser: Parser
@@ -273,6 +306,39 @@ class _ReleaseTest
         _h.log(recover val _Printer(ast) end)
         // _h.log(Changelog(ast)?.string())
         let changelog = Changelog(ast)? .> create_release("0.0.0", "0000-00-00")
+        let output: String = changelog.string()
+        _h.log(output)
+        _h.assert_eq[String](expected, output)
+      else
+        _h.log(recover val _Printer(r) end)
+        _h.fail()
+      end
+    | (let offset: USize, let r: Parser val) =>
+      let e = recover val SyntaxError(source, offset, r) end
+      _Logv(_h, PegFormatError.console(e))
+      _h.fail()
+    end
+
+class _ReleaseTestAfterAddingSomeEntries
+  let _h: TestHelper
+  let _parser: Parser
+
+  new create(h: TestHelper, parser: Parser) =>
+    (_h, _parser) = (h, parser)
+
+  fun run(input: String, expected: String) ? =>
+    let source = Source.from_string(input)
+    match recover val _parser.parse(source) end
+    | (let n: USize, let r: (AST | Token | NotPresent)) =>
+      match r
+      | let ast: AST =>
+        _h.log(recover val _Printer(ast) end)
+        let changelog = Changelog(ast)?
+          .> add_entry("fixed", "We made some fixes...\n")?
+          .> add_entry("fixed", "Oh, and we made a final one.\n")?
+          .> add_entry("added", "We added some stuff as well.\n")?
+          .> add_entry("changed", "And we changed a few things also.\n")?
+          .> create_release("0.0.0", "0000-00-00")
         let output: String = changelog.string()
         _h.log(output)
         _h.assert_eq[String](expected, output)

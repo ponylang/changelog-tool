@@ -70,6 +70,13 @@ actor Main
             ].values()),
           [edit],
           [ArgSpec.string("version")])?
+	CommandSpec.leaf(
+	  "add",
+	  "Add a new entry at the end of the section",
+	  [edit],
+	  [ ArgSpec.string("section")
+      ArgSpec.string("entry")
+	  ])?
       ])?
       .> add_help("help", "Print this message and exit")?
 
@@ -95,6 +102,10 @@ actor Main
     | "changelog-tool/release" =>
       cmd_release(
         path, filename, cmd.arg("version").string(), cmd.option("edit").bool())
+    | "changelog-tool/add" =>
+      cmd_add(
+        path, filename, cmd.arg("section").string(),
+        cmd.arg("entry").string(),cmd.option("edit").bool())
     else
       err("unknown command: " + cmd.fullname())
       please_report()
@@ -169,6 +180,24 @@ actor Main
           .string())
     else
       err("unable to perform release preparation")
+    end
+
+  fun cmd_add(
+    filepath: FilePath,
+    filename: String,
+    section: String,
+    entry: String,
+    edit: Bool)
+  =>
+    try
+      edit_or_print(
+        filepath,
+        edit,
+        Changelog(parse(filepath, filename)?)?
+          .> add_entry(section, entry)?
+          .string())
+    else
+      err("unable add a new changelog entry")
     end
 
   fun parse(filepath: FilePath, filename: String): peg.AST ? =>

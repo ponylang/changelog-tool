@@ -45,6 +45,11 @@ class Changelog
       unreleased = Release._unreleased()
     end
 
+  fun ref add_entry(section_name: String, entry: String) ? =>
+    match unreleased
+    | let r: Release => r.add_entry(section_name, entry)?
+    end
+
   fun string(): String iso^ =>
     let str = (recover String end)
       .> append("# Change Log\n\n")
@@ -79,25 +84,52 @@ class Release
     added = Section._empty(Added)
     changed = Section._empty(Changed)
 
-  fun string(): String iso^ =>
-    if heading == _unreleased_heading then
-      "\n\n".join(
-        [ heading
-          "### Fixed\n"
-          "### Added\n"
-          "### Changed\n"
-          ""
-        ].values())
-    else
-      let str = recover String .> append(heading) .> append("\n\n") end
-      for section in [fixed; added; changed].values() do
-        match section
-        | let s: Section box =>
-          str .> append(s.string()) .> append("\n")
-        end
+  fun ref add_entry(section_name: String, entry: String) ? =>
+    let section =
+      match section_name
+      | "fixed" =>
+        if fixed is None then fixed = Section._empty(Fixed) end
+        fixed as Section
+      | "added" =>
+        if added is None then added = Section._empty(Added) end
+        added as Section
+      | "changed" =>
+        if changed is None then changed = Section._empty(Changed) end
+        changed as Section
+      else error
       end
-      str
+    section.entries.push("- " + entry)
+
+  fun string(): String iso^ =>
+    // In order to represent the empty sections of unreleased releases,
+    // we must use the empty correspoding section when printing instead
+    // of None, otherwise it will be ignored.
+    let fixed' =
+      match fixed
+        | None if heading == _unreleased_heading => Section._empty(Fixed)
+      else fixed
+      end
+
+    let added' =
+      match added
+    |   None if heading == _unreleased_heading => Section._empty(Added)
+      else added
+      end
+
+    let changed' =
+      match changed
+      | None if heading == _unreleased_heading => Section._empty(Changed)
+      else changed
+      end
+
+    let str = recover String .> append(heading) .> append("\n\n") end
+    for section in [fixed'; added'; changed'].values() do
+      match section
+      | let s: Section box =>
+        str .> append(s.string()) .> append("\n")
+      end
     end
+    str
 
 class Section
   let label: TSection
