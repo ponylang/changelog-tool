@@ -83,7 +83,7 @@ PUSH_TO="https://${RELEASE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 VERSION="${GITHUB_REF/refs\/tags\/announce-/}"
 
 # Prepare release notes
-echo -e "\e[34mPreparing to update GitHub release notes..."
+echo -e "\e[34mPreparing to update GitHub release notes...\e[0m"
 body=$(changelog-tool get "${VERSION}")
 
 jsontemplate="
