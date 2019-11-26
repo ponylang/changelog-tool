@@ -55,10 +55,11 @@ changelog-tool unreleased -e
 ```
 
 ## Add an entry to an unreleased section
+
 ```bash
-changelog-tool add fixed "We fixed some bad issues" -e
-changelog-tool add added "We just added some new cool stuff" -e
-changelog-tool add changed "And changed things a bit" -e
+changelog-tool add fixed 'We fixed some bad issues' -e
+changelog-tool add added 'We just added some new cool stuff' -e
+changelog-tool add changed 'And changed things a bit' -e
 ```
 
 ## Prepare a Changelog for a Release
