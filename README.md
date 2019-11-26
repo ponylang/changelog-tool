@@ -2,6 +2,12 @@
 
 A tool for modifying the "standard pony" changelog
 
+## Status
+
+[![Actions Status](https://github.com/ponylang/changelog-tool/workflows/vs-ponyc-latest/badge.svg)](https://github.com/ponylang/changelog-tool/actions)
+
+Production ready.
+
 ## Installation
 
 The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
