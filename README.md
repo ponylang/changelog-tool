@@ -10,6 +10,12 @@ Production ready.
 
 ## Installation
 
+### Mac
+```bash
+brew install kaluza-tech/devint/changelog-tool
+```
+
+### Linux
 The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
 
 ```bash
