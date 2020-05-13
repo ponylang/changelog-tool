@@ -134,7 +134,7 @@ class iso _TestParseChangelog is UnitTest
     let testfile = "CHANGELOG.md"
 
     with file = OpenFile(
-      FilePath(h.env.root as AmbientAuth, testfile)?) as File
+      FilePath(h.env.root, testfile)?) as File
     do
       let source: String = file.read_string(file.size())
       let source' = Source.from_string(source)
