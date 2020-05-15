@@ -39,6 +39,6 @@ jobs:
       - name: Install pony tools
         run: bash .ci-scripts/install-macOS-tools.bash
       - name: Test with most recent ponyc release
-        run: make test
-        env:
-          PATH: "$HOME/.local/share/ponyup/bin/:${PATH}"
+        run: |
+          export PATH=$HOME/.local/share/ponyup/bin:$PATH
+          make test

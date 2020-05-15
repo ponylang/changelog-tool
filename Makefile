@@ -8,7 +8,6 @@ APPLICATION := changelog-tool
 COMPILE_WITH := corral run -- ponyc
 FETCH_DEPS_WITH := corral fetch
 CLEAN_DEPS_WITH := corral clean
-DEPS_DIR := .deps
 
 BUILD_DIR ?= build/$(config)
 SRC_DIR := $(APPLICATION)
