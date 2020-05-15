@@ -5,9 +5,9 @@ static ?= false
 linker ?=
 
 APPLICATION := changelog-tool
-COMPILE_WITH := stable env ponyc
-FETCH_DEPS_WITH := stable fetch
-DEPS_DIR := .deps
+COMPILE_WITH := corral run -- ponyc
+FETCH_DEPS_WITH := corral fetch
+CLEAN_DEPS_WITH := corral clean
 
 BUILD_DIR ?= build/$(config)
 SRC_DIR := $(APPLICATION)
@@ -69,10 +69,8 @@ GEN_FILES = $(patsubst %.pony.in, %.pony, $(GEN_FILES_IN))
 %.pony: %.pony.in VERSION
 	sed s/%%VERSION%%/$(version)/ $< > $@
 
-$(DEPS_DIR):
+$(binary): $(GEN_FILES) $(SOURCE_FILES) | $(BUILD_DIR)
 	$(FETCH_DEPS_WITH)
-
-$(binary): $(GEN_FILES) $(SOURCE_FILES) | $(BUILD_DIR) $(DEPS_DIR)
 	$(PONYC) -o $(BUILD_DIR) $(SRC_DIR)
 
 install: $(binary)
@@ -81,17 +79,16 @@ install: $(binary)
 	cp $^ $(DESTDIR)$(prefix)/bin
 
 test: $(binary)
+	$(FETCH_DEPS_WITH)
 	cd tests && \
-		stable env ponyc -d -V1 && ./tests && \
+		$(COMPILE_WITH) -d -V1 && ./tests && \
 		rm tests && \
 		sh verification.sh && \
 		cd ..
 
 clean:
+	$(CLEAN_DEPS_WITH)
 	rm -rf $(BUILD_DIR) $(GEN_FILES)
-
-realclean: clean
-	rm -rf $(DEPS_DIR)
 
 all: test $(binary)
 

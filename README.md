@@ -10,7 +10,7 @@ Production ready.
 
 ## Installation
 
-The changelog-tool requires [pony-stable](https://github.com/ponylang/pony-stable) to be installed.
+The changelog-tool requires [corral](https://github.com/ponylang/corral) to be installed.
 
 ```bash
 git clone https://github.com/ponylang/changelog-tool
