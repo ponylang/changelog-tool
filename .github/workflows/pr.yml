@@ -30,3 +30,15 @@ jobs:
       - uses: actions/checkout@v1
       - name: Test with most recent ponyc release
         run: make test
+
+  vs-ponyc-release-macos:
+    name: Verify PR builds most recent ponyc release on macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pony tools
+        run: bash .ci-scripts/install-macOS-tools.bash
+      - name: Test with most recent ponyc release
+        run: make test
+        env:
+          PATH: "$HOME/.local/share/ponyup/bin/:${PATH}"

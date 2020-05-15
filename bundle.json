@@ -1,9 +1,0 @@
-{
-  "deps": [
-    {
-      "tag": "fa7ef42",
-      "type": "github",
-      "repo": "ponylang/peg"
-    }
-  ]
-}
