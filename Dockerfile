@@ -13,7 +13,7 @@ WORKDIR /src/changelog-tool
 RUN make arch=x86-64 static=true linker=bfd \
  && make install
 
-FROM alpine:3.11
+FROM alpine:3.12
 
 COPY --from=build /usr/local/bin/changelog-tool /usr/local/bin/changelog-tool
 
