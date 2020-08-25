@@ -30,7 +30,8 @@ changelog-tool new
 ```bash
 changelog-tool verify
 ```
-```
+
+```text
 CHANGELOG.md is a valid changelog.
 ```
 
@@ -39,6 +40,7 @@ CHANGELOG.md is a valid changelog.
 ```bash
 changelog-tool get 0.2.2
 ```
+
 ```markdown
 ## [0.2.2] - 2018-01-16
 
@@ -71,6 +73,7 @@ changelog-tool release 0.13.1
 ```
 
 Example CHANGELOG.md (before):
+
 ```markdown
 # Change Log
 
@@ -93,7 +96,8 @@ All notable changes to this project will be documented in this file. This projec
 ```
 
 Example CHANGELOG.md (after):
-```
+
+```markdown
 # Change Log
 
 All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
