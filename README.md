@@ -1,6 +1,6 @@
 # changelog-tool
 
-A tool for modifying the "standard pony" changelog
+A tool for modifying the "standard pony" changelogs.
 
 ## Status
 
@@ -10,7 +10,19 @@ Production ready.
 
 ## Installation
 
-The changelog-tool requires [corral](https://github.com/ponylang/corral) to be installed.
+### Ponyup
+
+You can use [`ponyup`](https://github.com/ponylang/ponyup#installing-ponyup), our toolchain multiplexer, to download `nighly` builds, if you're using either Linux or macOS. Windows still requires building from source
+
+Linux and macOS:
+
+```bash
+ponyup update changelog-tool nightly
+```
+
+### Building From Source
+
+You will need `ponyc` in your PATH.
 
 ```bash
 git clone https://github.com/ponylang/changelog-tool
