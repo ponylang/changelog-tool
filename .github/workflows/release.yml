@@ -48,9 +48,11 @@ jobs:
         run: bash .ci-scripts/release/build-docker-images-on-release.bash
 
   trigger-release-announcement:
+    needs: [x86-64-unknown-linux-release, x86-64-apple-darwin-release, build-release-docker-images]
+
     name: Trigger release announcement
     runs-on: ubuntu-latest
-    needs: [x86-64-unknown-linux-release, x86-64-apple-darwin-release, build-release-docker-images]
+
     steps:
       - uses: actions/checkout@v1
       - name: Trigger
@@ -61,3 +63,20 @@ jobs:
           git_user_email: "ponylang.main@gmail.com"
         env:
           RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+
+  send-release-event:
+    needs: [x86-64-unknown-linux-release, x86-64-apple-darwin-release, build-release-docker-images]
+
+    name: Send release event
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo: ['ponylang/shared-docker']
+    steps:
+      - name: Send
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PONYLANG_MAIN_API_TOKEN }}
+          repository: ${{ matrix.repo }}
+          event-type: changelog-tool-released
+          client-payload: '{}'
