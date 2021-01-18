@@ -4,8 +4,6 @@ A tool for modifying the "standard pony" changelogs.
 
 ## Status
 
-[![Actions Status](https://github.com/ponylang/changelog-tool/workflows/vs-ponyc-latest/badge.svg)](https://github.com/ponylang/changelog-tool/actions)
-
 Production ready.
 
 ## Installation
