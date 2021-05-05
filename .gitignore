@@ -1,5 +1,6 @@
 .DS_Store
 *.dSYM
-.deps/
 /build/
 /changelog-tool/version.pony
+_repos/
+_corral/
