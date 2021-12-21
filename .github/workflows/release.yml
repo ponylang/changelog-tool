@@ -33,7 +33,7 @@ jobs:
     container:
       image: ponylang/shared-docker-ci-x86-64-unknown-linux-builder:release
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Build and upload
         run: bash .ci-scripts/release/x86-64-unknown-linux-release.bash
         env:
@@ -45,7 +45,7 @@ jobs:
     needs:
       - pre-artefact-creation
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Install pony tools
         run: bash .ci-scripts/install-macOS-tools.bash
       - name: brew install dependencies
@@ -63,7 +63,7 @@ jobs:
     needs:
       - pre-artefact-creation
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Docker login
         run: "docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD"
         env:
