@@ -2,7 +2,7 @@ FROM ponylang/ponyc:release-alpine AS build
 
 WORKDIR /src/changelog-tool
 
-COPY Makefile LICENSE VERSION corral.json lock.json /src/changelog-tool/
+COPY Makefile LICENSE VERSION corral.json /src/changelog-tool/
 
 WORKDIR /src/changelog-tool/changelog-tool
 

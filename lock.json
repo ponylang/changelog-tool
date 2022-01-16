@@ -1,8 +1,0 @@
-{
-  "locks": [
-    {
-      "locator": "github.com/ponylang/peg.git",
-      "revision": "0.1.2"
-    }
-  ]
-}
