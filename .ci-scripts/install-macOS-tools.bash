@@ -16,5 +16,5 @@ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/ponylang/
 
 export PATH="$HOME/.local/share/ponyup/bin/:$PATH"
 
-ponyup update ponyc release
-ponyup update corral release
+ponyup update ponyc nightly
+ponyup update corral nightly

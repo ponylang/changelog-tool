@@ -136,25 +136,27 @@ class iso _TestParseChangelog is UnitTest
     with file = OpenFile(
       FilePath(h.env.root, testfile)) as File
     do
-      let source: String = file.read_string(file.size())
-      let source' = Source.from_string(source)
-      match recover val p.parse(source') end
-      | (let n: USize, let r: (AST | Token | NotPresent)) =>
-        match r
-        | let ast: AST =>
-          let changelog = Changelog(ast)?
-          h.assert_eq[String](source, changelog.string())
-        else
-          h.log(recover val _Printer(r) end)
+      try
+        let source: String = file.read_string(file.size())
+        let source' = Source.from_string(source)
+        match recover val p.parse(source') end
+        | (let n: USize, let r: (AST | Token | NotPresent)) =>
+          match r
+          | let ast: AST =>
+            let changelog = Changelog(ast)?
+            h.assert_eq[String](source, changelog.string())
+          else
+            h.log(recover val _Printer(r) end)
+            h.fail()
+          end
+        | (let offset: USize, let r: Parser val) =>
+          let e = recover val SyntaxError(source', offset, r) end
+          _Logv(h, PegFormatError.console(e))
           h.fail()
         end
-      | (let offset: USize, let r: Parser val) =>
-        let e = recover val SyntaxError(source', offset, r) end
-        _Logv(h, PegFormatError.console(e))
+      else
         h.fail()
       end
-    else
-      h.fail()
     end
 
 class iso _TestRelease is UnitTest
