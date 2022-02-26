@@ -1,7 +1,7 @@
 use "collections"
 use "files"
 use "peg"
-use "ponytest"
+use "pony_test"
 use "../changelog-tool"
 
 actor Main is TestList
