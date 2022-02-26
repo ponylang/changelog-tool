@@ -1,7 +1,7 @@
 use "collections"
 use "files"
 use "peg"
-use "ponytest"
+use "pony_test"
 use "../changelog-tool"
 
 actor Main is TestList
@@ -134,7 +134,7 @@ class iso _TestParseChangelog is UnitTest
     let testfile = "CHANGELOG.md"
 
     with file = OpenFile(
-      FilePath(h.env.root, testfile)) as File
+      FilePath(FileAuth(h.env.root), testfile)) as File
     do
       try
         let source: String = file.read_string(file.size())

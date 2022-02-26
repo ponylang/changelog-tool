@@ -75,7 +75,7 @@ actor Main
   fun run(auth: AmbientAuth, cmd: Command) =>
     var filename = cmd.option("file").string()
     if filename == "" then filename = Info.default_filename() end
-    let path = FilePath(auth, filename)
+    let path = FilePath(FileAuth(auth), filename)
 
     match cmd.fullname()
     | "changelog-tool/version" => print("changelog-tool " + Info.version())
