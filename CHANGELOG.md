@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Update base image to alpine 3.16 ([PR #83](https://github.com/ponylang/changelog-tool/pull/83))
 
 ## [0.4.0] - 2019-11-09
 
