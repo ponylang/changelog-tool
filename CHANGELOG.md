@@ -12,7 +12,6 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
-- Update Dockerfile to using Alpine 3.12 ([PR #69](https://github.com/ponylang/changelog-tool/pull/69))
 
 ## [0.4.0] - 2019-11-09
 
