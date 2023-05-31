@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Drop Apple on Intel support ([PR #84](https://github.com/ponylang/changelog-tool/pull/84))
 
 ## [0.5.0] - 2022-07-12
 
