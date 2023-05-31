@@ -10,9 +10,9 @@ Production ready.
 
 ### Ponyup
 
-You can use [`ponyup`](https://github.com/ponylang/ponyup#installing-ponyup), our toolchain multiplexer, to download `nighly` builds, if you're using either Linux or macOS. Windows still requires building from source
+You can use [`ponyup`](https://github.com/ponylang/ponyup#installing-ponyup), our toolchain multiplexer, to download `nighly` builds, if you're using Linux. Other platforms require building from source.
 
-Linux and macOS:
+Linux:
 
 ```bash
 ponyup update changelog-tool nightly
