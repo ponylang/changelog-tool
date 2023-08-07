@@ -82,6 +82,7 @@ jobs:
     name: Send release event
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         repo: ['ponylang/shared-docker']
     steps:
