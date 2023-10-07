@@ -19,7 +19,7 @@ class iso _TestParseVersion is UnitTest
   fun name(): String => "parse version"
 
   fun apply(h: TestHelper) =>
-    ParseTest(h, ChangelogParser.version()).run(
+    ParseTest(h, recover val ChangelogParser.version() end).run(
       [ ("0.0.0", "$(Version$0.0.0)")
         ("0.0", "$(Version$0.0)")
         ("1.23.9", "$(Version$1.23.9)")
@@ -269,9 +269,9 @@ class iso _TestRelease is UnitTest
 
 class ParseTest
   let _h: TestHelper
-  let _parser: Parser
+  let _parser: Parser val
 
-  new create(h: TestHelper, parser: Parser) =>
+  new create(h: TestHelper, parser: Parser val) =>
     (_h, _parser) = (h, parser)
 
   fun run(tests: Array[(String, String)]) =>
@@ -294,9 +294,9 @@ class ParseTest
 
 class _ReleaseTest
   let _h: TestHelper
-  let _parser: Parser
+  let _parser: Parser val
 
-  new create(h: TestHelper, parser: Parser) =>
+  new create(h: TestHelper, parser: Parser val) =>
     (_h, _parser) = (h, parser)
 
   fun run(input: String, expected: String) ? =>
@@ -323,9 +323,9 @@ class _ReleaseTest
 
 class _ReleaseTestAfterAddingSomeEntries
   let _h: TestHelper
-  let _parser: Parser
+  let _parser: Parser val
 
-  new create(h: TestHelper, parser: Parser) =>
+  new create(h: TestHelper, parser: Parser val) =>
     (_h, _parser) = (h, parser)
 
   fun run(input: String, expected: String) ? =>
