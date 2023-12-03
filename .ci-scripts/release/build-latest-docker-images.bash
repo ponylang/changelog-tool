@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# *** You should already be logged in to DockerHub when you run this ***
+# *** You should already be logged in to GitHub Container Registry when you run
+#     this ***
 #
 # Builds docker latest docker images.
 #
@@ -32,13 +33,6 @@ fi
 # no unset variables allowed from here on out
 # allow above so we can display nice error messages for expected unset variables
 set -o nounset
-
-## DockerHub
-
-# Build and push "latest" tag e.g. ponylang/changelog-tool:latest
-DOCKER_TAG="${GITHUB_REPOSITORY}:latest"
-docker build --pull -t "${DOCKER_TAG}" .
-docker push "${DOCKER_TAG}"
 
 ## GitHub Container Registry
 
