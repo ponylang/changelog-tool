@@ -4,6 +4,9 @@ on:
   repository_dispatch:
     types: [shared-docker-linux-builders-updated]
 
+permissions:
+  packages: read
+
 jobs:
   vs-latest-ponyc:
     name: Verify main against the latest ponyc
