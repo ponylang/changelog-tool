@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file. This projec
 
 - Drop Apple on Intel support ([PR #84](https://github.com/ponylang/changelog-tool/pull/84))
 - Use Alpine 3.20 as our base image ([PR #110](https://github.com/ponylang/changelog-tool/pull/110))
+- Stop having a base image ([PR #112](https://github.com/ponylang/changelog-tool/pull/112))
 
 ## [0.5.0] - 2022-07-12
 
