@@ -8,6 +8,35 @@ permissions:
   packages: read
 
 jobs:
+  arm64-unknown-linux-nightly:
+    name: Build and upload arm64-unknown-linux-nightly to Cloudsmith
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+      - name: Pull Docker image
+        run: docker pull ghcr.io/ponylang/shared-docker-ci-arm64-unknown-linux-builder:latest
+      - name: Build and upload
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/root/project \
+            -w /root/project \
+            -e CLOUDSMITH_API_KEY=${{ secrets.CLOUDSMITH_API_KEY }} \
+            -e GITHUB_REPOSITORY=${{ github.repository }} \
+            ghcr.io/ponylang/shared-docker-ci-arm64-unknown-linux-builder:latest \
+            bash .ci-scripts/release/arm64-unknown-linux-nightly.bash
+      - name: Send alert on failure
+        if: ${{ failure() }}
+        uses: zulip/github-actions-zulip/send-message@e4c8f27c732ba9bd98ac6be0583096dea82feea5
+        with:
+          api-key: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_API_KEY }}
+          email: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_EMAIL }}
+          organization-url: 'https://ponylang.zulipchat.com/'
+          to: notifications
+          type: stream
+          topic: ${{ github.repository }} scheduled job failure
+          content: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.
+
   x86-64-unknown-linux-nightly:
     name: Build and upload x86-64-unknown-linux-nightly to Cloudsmith
     runs-on: ubuntu-latest
