@@ -10,3 +10,7 @@ Previously we were using Alpine 3.18 which has reached it's end-of-life. The cha
 
 Previously we were using Alpine 3.20 as the base image for the changelog-tool container image. We've switched to using the `scratch` image instead. This means that the container image is now much smaller and only contains the `changelog-tool` binary.
 
+## Add arm64 Linux builds
+
+We've added nightly and release builds for arm64 Linux.
+
