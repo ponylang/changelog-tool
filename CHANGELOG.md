@@ -2,17 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [unreleased] - unreleased
+## [0.5.2] - 2025-06-05
 
 ### Fixed
 
 - Fix Using Our Image with GitHub Container Actions ([PR #114](https://github.com/ponylang/changelog-tool/pull/114))
-
-### Added
-
-
-### Changed
-
 
 ## [0.5.1] - 2025-06-05
 
