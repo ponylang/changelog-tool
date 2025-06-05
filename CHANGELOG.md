@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Fix Using Our Image with GitHub Container Actions ([PR #114](https://github.com/ponylang/changelog-tool/pull/114))
 
 ### Added
 
