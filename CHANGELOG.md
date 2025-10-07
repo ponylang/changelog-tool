@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Update ponylang/peg dependency to 0.1.6 ([PR #115](https://github.com/ponylang/changelog-tool/pull/115))
 
 ## [0.5.2] - 2025-06-05
 
