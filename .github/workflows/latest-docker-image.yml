@@ -47,13 +47,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prune
-        # v4.1.1
-        uses: actions/delete-package-versions@0d39a63126868f5eefaa47169615edd3c0f61e20
+        # v3.0.1
+        uses: snok/container-retention-policy@3b0972b2276b171b212f8c4efbca59ebba26eceb
         with:
-          package-name: 'changelog-tool'
-          package-type: 'container'
-          min-versions-to-keep: 1
-          delete-only-untagged-versions: 'true'
+          account: ponylang
+          token: ${{ secrets.GITHUB_TOKEN }}
+          image-names: changelog-tool
+          tag-selection: untagged
+          cut-off: 1d
       - name: Send alert on failure
         if: ${{ failure() }}
         uses: zulip/github-actions-zulip/send-message@e4c8f27c732ba9bd98ac6be0583096dea82feea5
