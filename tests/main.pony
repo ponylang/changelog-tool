@@ -139,7 +139,7 @@ class iso _TestParseChangelog is UnitTest
       try
         let source: String = file.read_string(file.size())
         let source' = Source.from_string(source)
-        match recover val p.parse(source') end
+        match \exhaustive\ recover val p.parse(source') end
         | (let n: USize, let r: (AST | Token | NotPresent)) =>
           match r
           | let ast: AST =>
@@ -278,7 +278,7 @@ class ParseTest
     for (source, expected) in tests.values() do
       _h.log("test: " + source)
       let source' = Source.from_string(source)
-      match recover val _parser.parse(source') end
+      match \exhaustive\ recover val _parser.parse(source') end
       | (_, let r: (AST | Token | NotPresent)) =>
         let result = recover val _Printer(r) end
         _h.log(recover Printer(r) end)
@@ -301,7 +301,7 @@ class _ReleaseTest
 
   fun run(input: String, expected: String) ? =>
     let source = Source.from_string(input)
-    match recover val _parser.parse(source) end
+    match \exhaustive\ recover val _parser.parse(source) end
     | (let n: USize, let r: (AST | Token | NotPresent)) =>
       match r
       | let ast: AST =>
@@ -330,7 +330,7 @@ class _ReleaseTestAfterAddingSomeEntries
 
   fun run(input: String, expected: String) ? =>
     let source = Source.from_string(input)
-    match recover val _parser.parse(source) end
+    match \exhaustive\ recover val _parser.parse(source) end
     | (let n: USize, let r: (AST | Token | NotPresent)) =>
       match r
       | let ast: AST =>
@@ -359,7 +359,7 @@ primitive _Logv
     let str = recover String end
     for bs in bsi.values() do
       str.append(
-        match bs
+        match \exhaustive\ bs
         | let s: String => s
         | let a: Array[U8] val => String.from_array(a)
         end)
@@ -373,7 +373,7 @@ primitive _Printer
     s.append("$(")
     s.append(p.label().text())
 
-    match p
+    match \exhaustive\ p
     | let ast: AST =>
       for child in ast.children.values() do
         _Printer(child, depth + 1, indent, s)
