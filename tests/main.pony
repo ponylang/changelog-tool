@@ -359,7 +359,7 @@ primitive _Logv
     let str = recover String end
     for bs in bsi.values() do
       str.append(
-        match bs
+        match \exhaustive\ bs
         | let s: String => s
         | let a: Array[U8] val => String.from_array(a)
         end)

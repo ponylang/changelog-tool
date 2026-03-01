@@ -22,7 +22,7 @@ actor Main
     _env = consume env
 
     try
-      match CommandParser(spec()?).parse(_env.args, _env.vars)
+      match \exhaustive\ CommandParser(spec()?).parse(_env.args, _env.vars)
       | let c: Command => run(_env.root, c)
       | let h: CommandHelp => print(h.help_string())
       | let e: SyntaxError =>
