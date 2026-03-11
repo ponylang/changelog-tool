@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v6.0.2
         with:
           ref: "main"
           token: ${{ secrets.RELEASE_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
       - pre-artefact-creation
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v6.0.2
       - name: Pull Docker image
         run: docker pull ghcr.io/ponylang/shared-docker-ci-standard-builder:release
       - name: Build and upload
@@ -66,7 +66,7 @@ jobs:
     container:
       image: ghcr.io/ponylang/shared-docker-ci-standard-builder:release
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       - name: Build and upload
         run: bash .ci-scripts/release/x86-64-unknown-linux-release.bash
         env:
@@ -78,7 +78,7 @@ jobs:
     needs:
       - pre-artefact-creation
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       - name: Login to GitHub Container Registry
         # v2.2.0
         uses: docker/login-action@5139682d94efc37792e6b54386b5b470a68a4737
@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
         with:
           ref: "main"
           token: ${{ secrets.RELEASE_TOKEN }}

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v6.0.2
       - name: Pull Docker image
         run: docker pull ghcr.io/ponylang/shared-docker-ci-standard-builder:release
       - name: Build and upload
@@ -44,7 +44,7 @@ jobs:
     container:
       image: ghcr.io/ponylang/shared-docker-ci-standard-builder:release
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v6.0.2
       - name: Build and upload
         run: bash .ci-scripts/release/x86-64-unknown-linux-nightly.bash
         env:
