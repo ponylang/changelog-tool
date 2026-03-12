@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
       - name: Pull Docker image
-        run: docker pull ghcr.io/ponylang/shared-docker-ci-standard-builder:release
+        run: docker pull ghcr.io/ponylang/shared-docker-ci-standard-builder:nightly
       - name: Build and upload
         run: |
           docker run --rm \
@@ -24,7 +24,7 @@ jobs:
             -w /root/project \
             -e CLOUDSMITH_API_KEY=${{ secrets.CLOUDSMITH_API_KEY }} \
             -e GITHUB_REPOSITORY=${{ github.repository }} \
-            ghcr.io/ponylang/shared-docker-ci-standard-builder:release \
+            ghcr.io/ponylang/shared-docker-ci-standard-builder:nightly \
             bash .ci-scripts/release/arm64-unknown-linux-nightly.bash
       - name: Send alert on failure
         if: ${{ failure() }}
@@ -42,7 +42,7 @@ jobs:
     name: Build and upload x86-64-unknown-linux-nightly to Cloudsmith
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/ponylang/shared-docker-ci-standard-builder:release
+      image: ghcr.io/ponylang/shared-docker-ci-standard-builder:nightly
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Build and upload
