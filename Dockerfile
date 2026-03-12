@@ -1,4 +1,4 @@
-FROM ghcr.io/ponylang/ponyc:release AS build
+FROM ghcr.io/ponylang/ponyc:nightly AS build
 
 WORKDIR /src/changelog-tool
 
