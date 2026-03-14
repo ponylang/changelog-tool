@@ -19,11 +19,11 @@ permissions:
 
 jobs:
   vs-ponyc-nightly:
-    name: Verify PR builds most recent ponyc nightly
+    name: Verify PR builds most recent ponyc release
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/ponylang/shared-docker-ci-standard-builder:nightly
+      image: ghcr.io/ponylang/shared-docker-ci-standard-builder:release
     steps:
       - uses: actions/checkout@v6.0.2
-      - name: Test with most recent ponyc nightly
+      - name: Test with most recent ponyc release
         run: make test
