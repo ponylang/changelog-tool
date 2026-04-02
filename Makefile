@@ -83,7 +83,7 @@ test: $(binary)
 	cd tests && \
 		$(COMPILE_WITH) -d -V1 && ./tests && \
 		rm tests && \
-		sh verification.sh && \
+		sh verification.sh ../$(binary) && \
 		cd ..
 
 clean:
