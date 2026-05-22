@@ -2,3 +2,5 @@ CHANGELOG.md
 CODE_OF_CONDUCT.md
 tests/bad-changelogs/
 .release-notes/
+.claude/
+CLAUDE.md
