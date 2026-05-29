@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   arm64-unknown-linux-nightly:
-    name: Build and upload arm64-unknown-linux-nightly to Cloudsmith
+    name: Build and upload arm64-unknown-linux-nightly
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -41,7 +41,7 @@ jobs:
           content: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.
 
   x86-64-unknown-linux-nightly:
-    name: Build and upload x86-64-unknown-linux-nightly to Cloudsmith
+    name: Build and upload x86-64-unknown-linux-nightly
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ponylang/shared-docker-ci-standard-builder:release
