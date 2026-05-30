@@ -126,6 +126,7 @@ jobs:
 
   send-release-event:
     needs:
+      - arm64-unknown-linux-release
       - x86-64-unknown-linux-release
       - build-release-docker-images
     name: Send release event
