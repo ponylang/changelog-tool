@@ -10,7 +10,7 @@ COPY changelog-tool /src/changelog-tool/changelog-tool/
 
 WORKDIR /src/changelog-tool
 
-RUN make arch=x86-64 static=true linker=bfd \
+RUN make arch=x86-64 static=true \
  && make install
 
 FROM alpine:3.21

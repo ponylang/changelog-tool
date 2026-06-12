@@ -2,7 +2,6 @@ prefix ?= /usr/local
 config ?= release
 arch ?=
 static ?= false
-linker ?=
 
 APPLICATION := changelog-tool
 COMPILE_WITH := corral run -- ponyc
@@ -37,10 +36,6 @@ endif
 
 ifeq ($(static),true)
   PONYC += --static
-endif
-
-ifneq ($(linker),)
-  PONYC += --link-ldcmd=$(linker)
 endif
 
 # Default to version from `VERSION` file but allowing overridding on the
