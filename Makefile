@@ -76,7 +76,7 @@ install: $(binary)
 test: $(binary)
 	$(FETCH_DEPS_WITH)
 	cd tests && \
-		$(COMPILE_WITH) -d -V1 && ./tests && \
+		$(COMPILE_WITH) -d -V1 && ./tests --shuffle && \
 		rm tests && \
 		sh verification.sh ../$(binary) && \
 		cd ..
