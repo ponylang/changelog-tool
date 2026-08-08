@@ -86,7 +86,7 @@ clean:
 	$(CLEAN_DEPS_WITH)
 	rm -rf $(BUILD_DIR) $(GEN_FILES)
 
-lint:
+lint: $(GEN_FILES)
 	$(FETCH_DEPS_WITH)
 	$(LINT_WITH) .
 
