@@ -2,6 +2,11 @@ use "itertools"
 use "peg"
 
 class Changelog
+  """
+  A parsed changelog with an optional unreleased section and a list of
+  releases.
+  """
+
   let heading: String
   var unreleased: (Unreleased | None)
   embed released: Array[Release]
@@ -63,6 +68,11 @@ class Changelog
       ].values())
 
 class Unreleased
+  """
+  The unreleased section of a changelog, containing fixed, added, and
+  changed subsections.
+  """
+
   let heading: String = "## [unreleased] - unreleased"
   var fixed: Section
   var added: Section
@@ -73,7 +83,11 @@ class Unreleased
     added = Section._empty(Added)
     changed = Section._empty(Changed)
 
-  fun ref fill_ast(ast: AST) ? =>
+  fun ref fill_ast(ast: AST) ?
+  =>
+    """
+    Populate fixed, added, and changed sections from a parsed AST.
+    """
     if (ast.children(0)? as Token).string() != heading then error end
     try fixed = Section(ast.children(1)? as AST)? end
     try added = Section(ast.children(2)? as AST)? end
@@ -92,7 +106,12 @@ class Unreleased
         if entry.substring(-1) == "\n" then "" else "\n" end
       ].values()))
 
-  fun ref release(heading': String): Release^ =>
+  fun ref release(heading': String): Release^
+  =>
+    """
+    Convert this unreleased section into a release with the given
+    heading.
+    """
     let rel = Release._empty(heading')
     if not fixed.is_empty() then rel.fixed = fixed end
     if not added.is_empty() then rel.added = added end
@@ -103,6 +122,11 @@ class Unreleased
     Releases.show(heading, [fixed; added; changed].values())
 
 class Release
+  """
+  A single versioned release entry with optional Fixed, Added, and
+  Changed sections.
+  """
+
   var heading: String
   var fixed: (Section | None)
   var added: (Section | None)
@@ -124,7 +148,13 @@ class Release
     Releases.show(heading, [fixed; added; changed].values())
 
 primitive Releases
-  fun show(heading: String, sections: Iterator[(Section box | None)])
+  """
+  Renders a release heading followed by its sections as a string.
+  """
+
+  fun show(
+    heading: String,
+    sections: Iterator[(Section box | None)])
     : String iso^
   =>
     "\n".join(
@@ -135,6 +165,11 @@ primitive Releases
         .values())
 
 class Section
+  """
+  A changelog subsection (Fixed, Added, or Changed) containing a
+  list of entries.
+  """
+
   let label: TSection
   embed entries: Array[String]
 
