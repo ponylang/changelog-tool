@@ -1,6 +1,10 @@
 use "peg"
 
 primitive ChangelogParser
+  """
+  Builds a PEG parser that recognizes Keep a Changelog format.
+  """
+
   fun apply(): Parser val =>
     recover
       (head() * release(false).opt() * release().many()).eof()
@@ -64,14 +68,3 @@ primitive ChangelogParser
   fun digits(): Parser val => recover digit().many1() end
 
   fun digit(): Parser val => recover R('0', '9') end
-
-trait val TSection is Label
-primitive Fixed is TSection fun text(): String => "Fixed"
-primitive Added is TSection fun text(): String => "Added"
-primitive Changed is TSection fun text(): String => "Changed"
-
-primitive TRelease is Label fun text(): String => "Release"
-primitive TVersion is Label fun text(): String => "Version"
-primitive TDate is Label fun text(): String => "Date"
-primitive TEntries is Label fun text(): String => "Entries"
-primitive TEntry is Label fun text(): String => "Entry"

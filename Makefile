@@ -7,6 +7,7 @@ APPLICATION := changelog-tool
 COMPILE_WITH := corral run -- ponyc
 FETCH_DEPS_WITH := corral fetch
 CLEAN_DEPS_WITH := corral clean
+LINT_WITH := corral run -- pony-lint
 
 BUILD_DIR ?= build/$(config)
 SRC_DIR := $(APPLICATION)
@@ -85,12 +86,16 @@ clean:
 	$(CLEAN_DEPS_WITH)
 	rm -rf $(BUILD_DIR) $(GEN_FILES)
 
+lint: $(GEN_FILES)
+	$(FETCH_DEPS_WITH)
+	$(LINT_WITH) .
+
 all: test $(binary)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-.PHONY: all clean install test
+.PHONY: all clean install test lint
 
 
 

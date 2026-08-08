@@ -4,6 +4,11 @@ use peg = "peg"
 use "time"
 
 primitive Info
+  """
+  Project metadata: version string, default filename, and
+  repository URL.
+  """
+
   fun version(): String => Version()
   fun default_filename(): String => "CHANGELOG.md"
   fun project_repo(): String => "https://github.com/ponylang/changelog-tool"
@@ -62,17 +67,21 @@ actor Main
             ].values()),
           [edit],
           [ArgSpec.string("version")])?
-	CommandSpec.leaf(
-	  "add",
-	  "Add a new entry at the end of the section",
-	  [edit],
-	  [ ArgSpec.string("section")
-      ArgSpec.string("entry")
-	  ])?
+        CommandSpec.leaf(
+          "add",
+          "Add a new entry at the end of the section",
+          [edit],
+          [ ArgSpec.string("section")
+            ArgSpec.string("entry")
+          ])?
       ])?
       .> add_help("help", "Print this message and exit")?
 
   fun run(auth: AmbientAuth, cmd: Command) =>
+    """
+    Dispatch a parsed command to the appropriate subcommand
+    handler.
+    """
     var filename = cmd.option("file").string()
     if filename == "" then filename = Info.default_filename() end
     let path = FilePath(FileAuth(auth), filename)
@@ -90,8 +99,11 @@ actor Main
         path, filename, cmd.arg("version").string(), cmd.option("edit").bool())
     | "changelog-tool/add" =>
       cmd_add(
-        path, filename, cmd.arg("section").string(),
-        cmd.arg("entry").string(),cmd.option("edit").bool())
+        path,
+        filename,
+        cmd.arg("section").string(),
+        cmd.arg("entry").string(),
+        cmd.option("edit").bool())
     else
       err("unknown command: " + cmd.fullname())
       please_report()
@@ -114,7 +126,15 @@ actor Main
       err(filename + " is not a valid changelog.")
     end
 
-  fun cmd_get(filepath: FilePath, filename: String, selection: String) =>
+  fun cmd_get(
+    filepath: FilePath,
+    filename: String,
+    selection: String)
+  =>
+    """
+    Print the changelog section whose heading contains the given
+    selection string.
+    """
     let changelog =
       try
         Changelog(parse(filepath, filename)?)?

@@ -8,6 +8,9 @@ actor Main is TestList
   new create(env: Env) => PonyTest(env, this)
 
   fun tag tests(test: PonyTest) =>
+    """
+    Register all changelog-tool tests.
+    """
     test(_TestParseVersion)
     test(_TestParseDate)
     test(_TestParseEntries)
@@ -62,8 +65,13 @@ class iso _TestParseEntries is UnitTest
           "$(Entries$(Entry$- abc\n  * def\n    - ghi\n))" )
         ( "- @fowles: handle regex empty match.\n",
           "$(Entries$(Entry$- @fowles: handle regex empty match.\n))" )
-        ( "- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n",
-          "$(Entries$(Entry$- Upgrade to LLVM 3.9.1 ([PR #1498](https://github.com/ponylang/ponyc/pull/1498))\n))" )
+        ( "- Upgrade to LLVM 3.9.1 "
+          + "([PR #1498](https://github.com"
+          + "/ponylang/ponyc/pull/1498))\n",
+          "$(Entries$(Entry$- Upgrade to "
+          + "LLVM 3.9.1 ([PR #1498]"
+          + "(https://github.com/ponylang"
+          + "/ponyc/pull/1498))\n))" )
         ( """
           * stuff
 
@@ -75,7 +83,9 @@ class iso _TestParseEntries is UnitTest
 
           #
           """,
-          "$(Entries$(Entry$* stuff\n)$(Entry$* things\n)$(Entry$- more things\n))"
+          "$(Entries$(Entry$* stuff\n)"
+          + "$(Entry$* things\n)"
+          + "$(Entry$- more things\n))"
         )
       ])
 
@@ -84,12 +94,27 @@ class iso _TestParseHead is UnitTest
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.head()).run(
-      [ ( """
-          # Change Log
-
-          All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
-          """,
-          "$($All notable changes to the Pony compiler and standard library will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).)"
+      [ ( "# Change Log\n\n"
+          + "All notable changes to the"
+          + " Pony compiler and standard"
+          + " library will be documented"
+          + " in this file. This project"
+          + " adheres to [Semantic"
+          + " Versioning]"
+          + "(http://semver.org/) and"
+          + " [Keep a CHANGELOG]"
+          + "(http://keepachangelog.com/"
+          + ").\n",
+          "$($All notable changes to the"
+          + " Pony compiler and standard"
+          + " library will be documented"
+          + " in this file. This project"
+          + " adheres to [Semantic"
+          + " Versioning]"
+          + "(http://semver.org/) and"
+          + " [Keep a CHANGELOG]"
+          + "(http://keepachangelog.com/"
+          + ").)"
         )
         ( """
           # Change Log
@@ -163,33 +188,24 @@ class iso _TestRelease is UnitTest
   fun name(): String => "release"
 
   fun apply(h: TestHelper) ? =>
+    let pr =
+      "([PR #32](https://github.com"
+      + "/ponylang/pony-stable/pull/32))"
     _ReleaseTest(h, ChangelogParser()).run(
-      """
-      # Change Log
-
-      ## [unreleased] - unreleased
-
-      ### Fixed
-
-      - Fix invalid separator in PONYPATH for Windows. ([PR #32](https://github.com/ponylang/pony-stable/pull/32))
-
-      ### Added
-
-
-      ### Changed
-
-
-      """,
-      """
-      # Change Log
-
-      ## [0.0.0] - 0000-00-00
-
-      ### Fixed
-
-      - Fix invalid separator in PONYPATH for Windows. ([PR #32](https://github.com/ponylang/pony-stable/pull/32))
-
-      """)?
+      "# Change Log\n\n"
+      + "## [unreleased] - unreleased\n\n"
+      + "### Fixed\n\n"
+      + "- Fix invalid separator in "
+      + "PONYPATH for Windows. "
+      + pr + "\n\n"
+      + "### Added\n\n\n"
+      + "### Changed\n\n\n",
+      "# Change Log\n\n"
+      + "## [0.0.0] - 0000-00-00\n\n"
+      + "### Fixed\n\n"
+      + "- Fix invalid separator in "
+      + "PONYPATH for Windows. "
+      + pr + "\n\n")?
 
     _ReleaseTest(h, ChangelogParser()).run(
       """
@@ -268,6 +284,11 @@ class iso _TestRelease is UnitTest
       """)?
 
 class ParseTest
+  """
+  Runs a list of (input, expected) pairs through a PEG parser and
+  asserts the printed AST matches.
+  """
+
   let _h: TestHelper
   let _parser: Parser val
 
@@ -278,7 +299,7 @@ class ParseTest
     for (source, expected) in tests.values() do
       _h.log("test: " + source)
       let source' = Source.from_string(source)
-      match recover val _parser.parse(source') end
+      match \exhaustive\ recover val _parser.parse(source') end
       | (_, let r: (AST | Token | NotPresent)) =>
         let result = recover val _Printer(r) end
         _h.log(recover Printer(r) end)
@@ -367,8 +388,12 @@ primitive _Logv
     h.log(consume str)
 
 primitive _Printer
-  fun apply(p: ASTChild, depth: USize = 0, indent: String = "  ",
-    s: String ref = String): String ref
+  fun apply(
+    p: ASTChild,
+    depth: USize = 0,
+    indent: String = "  ",
+    s: String ref = String)
+    : String ref
   =>
     s.append("$(")
     s.append(p.label().text())
