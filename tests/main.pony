@@ -299,7 +299,7 @@ class ParseTest
     for (source, expected) in tests.values() do
       _h.log("test: " + source)
       let source' = Source.from_string(source)
-      match recover val _parser.parse(source') end
+      match \exhaustive\ recover val _parser.parse(source') end
       | (_, let r: (AST | Token | NotPresent)) =>
         let result = recover val _Printer(r) end
         _h.log(recover Printer(r) end)
