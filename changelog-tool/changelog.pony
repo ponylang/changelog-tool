@@ -106,7 +106,7 @@ class Unreleased
     end
 
   fun ref add_entry(section_name: String, entry: String) ? =>
-    if entry.count("[PR #") > 1 then error end
+    _ValidatePRCount(entry)?
     let section =
       match section_name
       | "fixed" => fixed
@@ -193,7 +193,7 @@ class Section
       entries = Array[String](es.size())
       for entry in es.children.values() do
         let s: String val = try (entry as Token).string() else error end
-        if s.count("[PR #") > 1 then error end
+        _ValidatePRCount(s)?
         entries.push(s)
       end
     else
@@ -218,6 +218,12 @@ primitive _ParseSection
     else
       None
     end
+
+primitive _ValidatePRCount
+  fun apply(s: String box) ? =>
+    let lower: String val = s.lower()
+    let total = lower.count("[pr #") + lower.count("[pr#")
+    if (total > 1) or (total > s.count("[PR #")) then error end
 
 primitive _IsUnreleased
   fun apply(ast: AST): Bool =>
