@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Reject changelog entries with multiple PR references ([PR #159](https://github.com/ponylang/changelog-tool/pull/159))
 
 ### Added
 
