@@ -32,7 +32,13 @@ class Changelog
       end
 
     if ast.size() > 1 then
-      unreleased = try Unreleased .> fill_ast(children.next()? as AST)? end
+      unreleased =
+        match try children.next()? as AST end
+        | let child: AST =>
+          if _IsUnreleased(child) then
+            Unreleased .> fill_ast(child)?
+          end
+        end
       for child in children do
         released.push(Release(child as AST)?)
       end
@@ -89,11 +95,18 @@ class Unreleased
     Populate fixed, added, and changed sections from a parsed AST.
     """
     if (ast.children(0)? as Token).string() != heading then error end
-    try fixed = Section(ast.children(1)? as AST)? end
-    try added = Section(ast.children(2)? as AST)? end
-    try changed = Section(ast.children(3)? as AST)? end
+    match _ParseSection(ast, 1)?
+    | let s: Section => fixed = s
+    end
+    match _ParseSection(ast, 2)?
+    | let s: Section => added = s
+    end
+    match _ParseSection(ast, 3)?
+    | let s: Section => changed = s
+    end
 
   fun ref add_entry(section_name: String, entry: String) ? =>
+    if entry.count("[PR #") > 1 then error end
     let section =
       match section_name
       | "fixed" => fixed
@@ -134,9 +147,9 @@ class Release
 
   new create(ast: AST) ? =>
     heading = (ast.children(0)? as Token).string()
-    fixed = try Section(ast.children(1)? as AST)? else None end
-    added = try Section(ast.children(2)? as AST)? else None end
-    changed = try Section(ast.children(3)? as AST)? else None end
+    fixed = _ParseSection(ast, 1)?
+    added = _ParseSection(ast, 2)?
+    changed = _ParseSection(ast, 3)?
 
   new _empty(heading': String) =>
     heading = heading'
@@ -175,11 +188,16 @@ class Section
 
   new create(ast: AST) ? =>
     label = (ast.children(0)? as Token).label() as TSection
-    let es = ast.children(1)? as AST
-    entries = Array[String](es.size())
-
-    for entry in es.children.values() do
-      try entries.push((entry as Token).string()) end
+    match try ast.children(1)? as AST end
+    | let es: AST =>
+      entries = Array[String](es.size())
+      for entry in es.children.values() do
+        let s: String val = try (entry as Token).string() else error end
+        if s.count("[PR #") > 1 then error end
+        entries.push(s)
+      end
+    else
+      entries = Array[String]
     end
 
   new _empty(label': TSection) =>
@@ -192,3 +210,19 @@ class Section
       [ "### "; label.text(); "\n\n"
         "".join(entries.values())
       ].values())
+
+primitive _ParseSection
+  fun apply(ast: AST, index: USize): (Section | None) ? =>
+    match try ast.children(index)? end
+    | let child: AST => Section(child)?
+    else
+      None
+    end
+
+primitive _IsUnreleased
+  fun apply(ast: AST): Bool =>
+    try
+      (ast.children(0)? as Token).string() == Unreleased.heading
+    else
+      false
+    end
