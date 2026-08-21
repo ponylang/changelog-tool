@@ -4,7 +4,7 @@ use "peg"
 use "pony_test"
 use "../changelog-tool"
 
-actor Main is TestList
+actor \nodoc\ Main is TestList
   new create(env: Env) => PonyTest(env, this)
 
   fun tag tests(test: PonyTest) =>
@@ -65,13 +65,13 @@ class iso _TestParseEntries is UnitTest
           "$(Entries$(Entry$- abc\n  * def\n    - ghi\n))" )
         ( "- @fowles: handle regex empty match.\n",
           "$(Entries$(Entry$- @fowles: handle regex empty match.\n))" )
-        ( "- Upgrade to LLVM 3.9.1 "
-          + "([PR #1498](https://github.com"
-          + "/ponylang/ponyc/pull/1498))\n",
-          "$(Entries$(Entry$- Upgrade to "
-          + "LLVM 3.9.1 ([PR #1498]"
-          + "(https://github.com/ponylang"
-          + "/ponyc/pull/1498))\n))" )
+        ( "- Upgrade to LLVM 3.9.1 " +
+          "([PR #1498](https://github.com" +
+          "/ponylang/ponyc/pull/1498))\n",
+          "$(Entries$(Entry$- Upgrade to " +
+          "LLVM 3.9.1 ([PR #1498]" +
+          "(https://github.com/ponylang" +
+          "/ponyc/pull/1498))\n))" )
         ( """
           * stuff
 
@@ -83,9 +83,9 @@ class iso _TestParseEntries is UnitTest
 
           #
           """,
-          "$(Entries$(Entry$* stuff\n)"
-          + "$(Entry$* things\n)"
-          + "$(Entry$- more things\n))"
+          "$(Entries$(Entry$* stuff\n)" +
+          "$(Entry$* things\n)" +
+          "$(Entry$- more things\n))"
         )
       ])
 
@@ -94,27 +94,27 @@ class iso _TestParseHead is UnitTest
 
   fun apply(h: TestHelper) =>
     ParseTest(h, ChangelogParser.head()).run(
-      [ ( "# Change Log\n\n"
-          + "All notable changes to the"
-          + " Pony compiler and standard"
-          + " library will be documented"
-          + " in this file. This project"
-          + " adheres to [Semantic"
-          + " Versioning]"
-          + "(http://semver.org/) and"
-          + " [Keep a CHANGELOG]"
-          + "(http://keepachangelog.com/"
-          + ").\n",
-          "$($All notable changes to the"
-          + " Pony compiler and standard"
-          + " library will be documented"
-          + " in this file. This project"
-          + " adheres to [Semantic"
-          + " Versioning]"
-          + "(http://semver.org/) and"
-          + " [Keep a CHANGELOG]"
-          + "(http://keepachangelog.com/"
-          + ").)"
+      [ ( "# Change Log\n\n" +
+          "All notable changes to the" +
+          " Pony compiler and standard" +
+          " library will be documented" +
+          " in this file. This project" +
+          " adheres to [Semantic" +
+          " Versioning]" +
+          "(http://semver.org/) and" +
+          " [Keep a CHANGELOG]" +
+          "(http://keepachangelog.com/" +
+          ").\n",
+          "$($All notable changes to the" +
+          " Pony compiler and standard" +
+          " library will be documented" +
+          " in this file. This project" +
+          " adheres to [Semantic" +
+          " Versioning]" +
+          "(http://semver.org/) and" +
+          " [Keep a CHANGELOG]" +
+          "(http://keepachangelog.com/" +
+          ").)"
         )
         ( """
           # Change Log
@@ -189,23 +189,23 @@ class iso _TestRelease is UnitTest
 
   fun apply(h: TestHelper) ? =>
     let pr =
-      "([PR #32](https://github.com"
-      + "/ponylang/pony-stable/pull/32))"
+      "([PR #32](https://github.com" +
+      "/ponylang/pony-stable/pull/32))"
     _ReleaseTest(h, ChangelogParser()).run(
-      "# Change Log\n\n"
-      + "## [unreleased] - unreleased\n\n"
-      + "### Fixed\n\n"
-      + "- Fix invalid separator in "
-      + "PONYPATH for Windows. "
-      + pr + "\n\n"
-      + "### Added\n\n\n"
-      + "### Changed\n\n\n",
-      "# Change Log\n\n"
-      + "## [0.0.0] - 0000-00-00\n\n"
-      + "### Fixed\n\n"
-      + "- Fix invalid separator in "
-      + "PONYPATH for Windows. "
-      + pr + "\n\n")?
+      "# Change Log\n\n" +
+      "## [unreleased] - unreleased\n\n" +
+      "### Fixed\n\n" +
+      "- Fix invalid separator in " +
+      "PONYPATH for Windows. " +
+      pr + "\n\n" +
+      "### Added\n\n\n" +
+      "### Changed\n\n\n",
+      "# Change Log\n\n" +
+      "## [0.0.0] - 0000-00-00\n\n" +
+      "### Fixed\n\n" +
+      "- Fix invalid separator in " +
+      "PONYPATH for Windows. " +
+      pr + "\n\n")?
 
     _ReleaseTest(h, ChangelogParser()).run(
       """

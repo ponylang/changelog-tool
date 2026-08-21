@@ -25,10 +25,10 @@ primitive ChangelogParser
           (L("## [") * version() * L("] - ") * date()).term()
         end
 
-      (heading * -L("\n").many1()
-        * section(Fixed, released).opt()
-        * section(Added, released).opt()
-        * section(Changed, released).opt()).node(TRelease)
+      (heading * -L("\n").many1() *
+        section(Fixed, released).opt() *
+        section(Added, released).opt() *
+        section(Changed, released).opt()).node(TRelease)
     end
 
   fun section(s: TSection, released: Bool): Parser val =>
