@@ -8,7 +8,6 @@
 # Tools required in the environment that runs this:
 #
 # - bash
-# - cloudsmith-cli
 # - GNU gzip
 # - GNU make
 # - ponyc (musl based version)
@@ -102,11 +101,22 @@ pushd "${BUILD_PREFIX}" || exit 1
 tar -cvzf "${ASSET_FILE}" -- *
 popd || exit 1
 
+# Fetch cloudsmith-uploader
+UPLOADER_VERSION="0.1.0"
+UPLOADER_DIR=$(mktemp -d)
+UPLOADER_ARCHIVE="cloudsmith-uploader-arm64-unknown-linux.tar.gz"
+echo -e "\e[34mDownloading cloudsmith-uploader ${UPLOADER_VERSION}...\e[0m"
+curl -fsSL -o "${UPLOADER_DIR}/${UPLOADER_ARCHIVE}" \
+  "https://github.com/ponylang/cloudsmith-uploader/releases/download/${UPLOADER_VERSION}/${UPLOADER_ARCHIVE}"
+tar -xzf "${UPLOADER_DIR}/${UPLOADER_ARCHIVE}" -C "${UPLOADER_DIR}"
+UPLOADER="${UPLOADER_DIR}/${UPLOADER_VERSION}/bin/cloudsmith-uploader"
+chmod +x "${UPLOADER}"
+
 # Ship it off to cloudsmith
 echo -e "\e[34mUploading package to cloudsmith...\e[0m"
-cloudsmith push raw --version "${CLOUDSMITH_VERSION}" \
+"${UPLOADER}" --version "${CLOUDSMITH_VERSION}" \
   --api-key "${CLOUDSMITH_API_KEY}" --summary "${ASSET_SUMMARY}" \
-  --description "${ASSET_DESCRIPTION}" ${ASSET_PATH} "${ASSET_FILE}"
+  --description "${ASSET_DESCRIPTION}" "${ASSET_PATH}" "${ASSET_FILE}"
 
 # Additionally publish to GHCR as an OCI artifact. Runs after the Cloudsmith
 # push (the current primary) and reuses TODAY and ASSET_FILE so both
