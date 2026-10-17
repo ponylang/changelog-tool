@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Require ponyc 0.77.0 to build from source ([PR #165](https://github.com/ponylang/changelog-tool/pull/165))
 
 ## [0.5.3] - 2026-08-21
 
