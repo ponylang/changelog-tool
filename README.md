@@ -20,7 +20,7 @@ ponyup update changelog-tool nightly
 
 ### Building From Source
 
-You will need `ponyc` in your PATH.
+Building from source requires ponyc 0.77.0 or later.
 
 ```bash
 git clone https://github.com/ponylang/changelog-tool
