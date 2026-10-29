@@ -65,7 +65,7 @@ class Changelog
     | let u: Unreleased => u.add_entry(section_name, entry)?
     end
 
-  fun string(): String iso^ =>
+  fun string(): String =>
     "".join(
       [ "# Change Log\n\n"
         if heading == "" then "" else "".join([heading; "\n\n"].values()) end
@@ -131,7 +131,7 @@ class Unreleased
     if not changed.is_empty() then rel.changed = changed end
     rel
 
-  fun string(): String iso^ =>
+  fun string(): String =>
     Releases.show(heading, [fixed; added; changed].values())
 
 class Release
@@ -157,7 +157,7 @@ class Release
     added = None
     changed = None
 
-  fun string(): String iso^ =>
+  fun string(): String =>
     Releases.show(heading, [fixed; added; changed].values())
 
 primitive Releases
@@ -168,7 +168,7 @@ primitive Releases
   fun show(
     heading: String,
     sections: Iterator[(Section box | None)])
-    : String iso^
+    : String
   =>
     "\n".join(
       [heading; ""]
@@ -205,7 +205,7 @@ class Section
 
   fun is_empty(): Bool => entries.size() == 0
 
-  fun string(): String iso^ =>
+  fun string(): String =>
     "".join(
       [ "### "; label.text(); "\n\n"
         "".join(entries.values())
