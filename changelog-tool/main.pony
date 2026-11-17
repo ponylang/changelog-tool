@@ -40,12 +40,12 @@ actor Main
     end
 
   fun spec(): CommandSpec ? =>
-    let edit = OptionSpec.bool("edit", "Modify the changelog file", 'e', false)
+    let edit = OptionSpec.bool("edit", "Modify the changelog file", 'e', false)?
     CommandSpec.parent(
       "changelog-tool",
       "",
       [ OptionSpec.string(
-        "file", "Path of the changelog", 'f', Info.default_filename())
+        "file", "Path of the changelog", 'f', Info.default_filename())?
       ],
       [ CommandSpec.leaf("version", "Show the version and exit")?
         CommandSpec.leaf("new", "Create an new, empty changelog")?
@@ -54,7 +54,7 @@ actor Main
           "get",
           "Print the changelog sections for a selected release",
           [],
-          [ArgSpec.string("selection")])?
+          [ArgSpec.string("selection")?])?
         CommandSpec.leaf(
           "unreleased",
           "Add unreleased section to changelog if none exists",
@@ -66,13 +66,13 @@ actor Main
               "e.g. `changelog-tool release 0.13.1`"
             ].values()),
           [edit],
-          [ArgSpec.string("version")])?
+          [ArgSpec.string("version")?])?
         CommandSpec.leaf(
           "add",
           "Add a new entry at the end of the section",
           [edit],
-          [ ArgSpec.string("section")
-            ArgSpec.string("entry")
+          [ ArgSpec.string("section")?
+            ArgSpec.string("entry")?
           ])?
       ])?
       .> add_help("help", "Print this message and exit")?
